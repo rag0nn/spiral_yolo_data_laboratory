@@ -5,7 +5,8 @@
     <p>a</p>
   </div>
   <div>
-      <details open> asd
+      <details open> 
+            <summary>:🔖 123</summary>
      <h3>Usage</h3>
       <p>s</p>   
        </details>
