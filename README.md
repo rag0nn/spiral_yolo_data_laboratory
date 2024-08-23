@@ -6,7 +6,7 @@
   </div>
   <div>
      <h3>Usage</h3>
-      <p><s/p>      
+      <p>s</p>      
   </div>
   <div>
   <h3>File and Class Hieararchy</h3>
