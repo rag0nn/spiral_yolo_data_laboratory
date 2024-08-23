@@ -4,7 +4,7 @@
     <h3>What is The SpirAi Data Lab?</h3>
     <p>a</p>
   </div>
-  <div>
+  <div open>
      <h3>Usage</h3>
       <p>s</p>      
   </div>
