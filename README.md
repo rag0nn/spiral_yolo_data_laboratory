@@ -4,9 +4,11 @@
     <h3>What is The SpirAi Data Lab?</h3>
     <p>a</p>
   </div>
-  <div open>
+  <div>
+      <details open>
      <h3>Usage</h3>
-      <p>s</p>      
+      <p>s</p>   
+       </details>
   </div>
   <div>
   <h3>File and Class Hieararchy</h3>
