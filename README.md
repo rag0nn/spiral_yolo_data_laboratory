@@ -6,9 +6,8 @@
   </div>
   <div>
       <details open> 
-            <summary>:🔖 123</summary>
-     <h3>Usage</h3>
-      <p>s</p>   
+            <summary>📘 Usage</summary>
+      <p>It can be added as a local library or can be used by cloning this repo and importing it with a py file in its parent directory.</p>   
        </details>
   </div>
   <div>
