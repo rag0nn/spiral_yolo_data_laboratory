@@ -15,7 +15,7 @@
 </div>
 
 <h2>🌲 File and Class Hieararchy</h2>
-'''bash
+```bash
 ├── app
 │   ├── css
 │   │   ├── **/*.css
@@ -34,6 +34,6 @@
 ├── package.json
 ├── bower.json (if using bower)
 └── .gitignore
-'''
+```
 
 
