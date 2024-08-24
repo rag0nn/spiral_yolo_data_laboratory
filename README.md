@@ -14,7 +14,6 @@
   <div>
       <details open> 
             <summary>🌲 File and Class Hieararchy</summary>
-            <p>
 
                   ```bash
 ├── app
@@ -36,6 +35,6 @@
 ├── bower.json (if using bower)
 └── .gitignore
 ```
-            </p>
+
   </div>
 </div>
