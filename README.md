@@ -8,6 +8,7 @@
       <details open> 
             <summary>📘 Usage</summary>
       <p>It can be added as a local library or can be used by cloning this repo and importing it with a py file in its parent directory.</p>   
+            <p>asd</p>
        </details>
   </div>
   <div>
