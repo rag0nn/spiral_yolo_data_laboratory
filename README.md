@@ -12,28 +12,20 @@
             <p>For dataset processes you can use scripts in datasets folder<, for testing you can use test folder. The models folder is for the YOLO models/p>
        </details>
   </div>
+<details>
+      <summary>🌲 File and Class Hieararchy</summary>
+      <p><b>Dataset folder</b></p>
+      <p>datasets: This is where the datasets will sit</p>
+      <p>merge: This is the merged datasets outputs</p>
+      <p>utils.py: Scripts for the dataset processes</p>
+      <p><b>Models folder</b></p>
+      <p>It includes yolo models</p>
+      <p><b>Test Folder</b></p>
+      <p>data: It is where test datas. 3 data type for the use. They are 'video','frames' and 'images'. You can choose for your data type</p>
+      <p>apply.py: Scripts for the test processes. You can start with create_data() function</p>
+</details>
 </div>
 
-<h2>🌲 File and Class Hieararchy</h2>
-```bash
-├── app
-│   ├── css
-│   │   ├── **/*.css
-│   ├── favicon.ico
-│   ├── images
-│   ├── index.html
-│   ├── js
-│   │   ├── **/*.js
-│   └── partials/template
-├── dist (or build)
-├── node_modules
-├── bower_components (if using bower)
-├── test
-├── Gruntfile.js/gulpfile.js
-├── README.md
-├── package.json
-├── bower.json (if using bower)
-└── .gitignore
-```
+
 
 
