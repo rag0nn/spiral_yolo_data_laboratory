@@ -7,12 +7,35 @@
   <div>
       <details open> 
             <summary>📘 Usage</summary>
-      <p>It can be added as a local library or can be used by cloning this repo and importing it with a py file in its parent directory.</p>   
-            <p>asd</p>
+            <p>It can be added as a local library or can be used by cloning this repo and importing it with a py file in its parent directory.</p>   
+            <p>For dataset processes you can use scripts in datasets folder<, for testing you can use test folder. The models folder is for the YOLO models/p>
        </details>
   </div>
   <div>
-  <h3>File and Class Hieararchy</h3>
-  <p>s</p>
+      <details open> 
+            <summary>🌲 File and Class Hieararchy</summary>
+            <p>
+
+                  ```bash
+├── app
+│   ├── css
+│   │   ├── **/*.css
+│   ├── favicon.ico
+│   ├── images
+│   ├── index.html
+│   ├── js
+│   │   ├── **/*.js
+│   └── partials/template
+├── dist (or build)
+├── node_modules
+├── bower_components (if using bower)
+├── test
+├── Gruntfile.js/gulpfile.js
+├── README.md
+├── package.json
+├── bower.json (if using bower)
+└── .gitignore
+```
+            </p>
   </div>
 </div>
