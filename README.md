@@ -37,3 +37,9 @@
 
   </div>
 </div>
+
+
+```html
+<!- Serves app/js/main.js-->
+<script data-aero-build="debug" src="/js/main.js"></script>
+```
