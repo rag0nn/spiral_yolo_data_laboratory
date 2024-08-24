@@ -12,7 +12,7 @@
             <p>For dataset processes you can use scripts in datasets folder<, for testing you can use test folder. The models folder is for the YOLO models/p>
        </details>
   </div>
-<details>
+<details open>
       <summary>🌲 File and Class Hieararchy</summary>
       <p><b>Dataset folder</b></p>
       <p>datasets: This is where the datasets will sit</p>
