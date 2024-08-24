@@ -15,14 +15,14 @@
 <details open>
       <summary>🌲 File and Class Hieararchy</summary>
       <p><b>Dataset folder</b></p>
-      <p>   datasets: This is where the datasets will sit</p>
-      <p>   merge: This is the merged datasets outputs</p>
-      <p>   utils.py: Scripts for the dataset processes</p>
+      <p>---datasets: This is where the datasets will sit</p>
+      <p>---merge: This is the merged datasets outputs</p>
+      <p>---utils.py: Scripts for the dataset processes</p>
       <p><b>Models folder</b></p>
-      <p>   It includes yolo models</p>
+      <p>---It includes yolo models</p>
       <p><b>Test Folder</b></p>
-      <p>   data: It is where test datas. 3 data type for the use. They are 'video','frames' and 'images'. You can choose for your data type</p>
-      <p>   apply.py: Scripts for the test processes. You can start with create_data() function</p>
+      <p>---data: It is where test datas. 3 data type for the use. They are 'video','frames' and 'images'. You can choose for your data type</p>
+      <p>---apply.py: Scripts for the test processes. You can start with create_data() function</p>
 </details>
 </div>
 
