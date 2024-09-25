@@ -7,10 +7,14 @@ import pandas as pd
 from spiral_events.object_detection.object import SpiralObject
 from IPython.display import clear_output
 import shutil
+import numpy as np
 
-# batch test func test edilecek
+now = datetime.now()
+date_string = now.strftime("%Y-%m-%d")
 
-DATA_PATH =os.path.dirname(os.path.abspath(__file__)) + "/data"
+
+MAIN_PATH = os.path.dirname(os.path.abspath(__file__))
+DATA_PATH = MAIN_PATH + "/data"
 
 class TestData:
     def __init__(self,path):
@@ -503,8 +507,6 @@ class _TestFrames(TestData):
         predicted_translations_x = []
         predicted_translations_y = []
 
-
-
         # Kaydediciyi başlatma
         if save_predicted_frames: 
 
@@ -735,6 +737,8 @@ def chose_test_data():
         data = _TestFrames(root + "/data/" + data_names[k])
     else:
         assert "Verinin türü info.yaml dosyasında yanlış belirtilmiştir"
+
+    write_project_log("Test Verisi seçildi: ",data_names[k])
     return data
 
 def chose_spiral_model():
@@ -748,6 +752,7 @@ def chose_spiral_model():
     assert k < len(model_names), "İndex veri sayısını geçmemelidir"
     assert k >= 0, "İndex positif olmalıdır"
     model_path = "/".join(os.path.dirname(os.path.abspath(__file__)).split("\\")[:-1]) + "/models" + "/" + model_names[k]
+    write_project_log("Yolo ağırlığı seçildi: ",model_names[k])
     return model_path
 
 def create_new_data(name,type):
@@ -759,6 +764,7 @@ def create_new_data(name,type):
     """
     assert type in ["video","frames","images"] , "Yanlış girdi girildi"
     TestData.create(name,DATA_PATH,type)
+    write_project_log("Yeni veri oluşturuldu: ",name)
 
 def batch_test_videos(
              test_name:str = "batch_test",
@@ -773,6 +779,7 @@ def batch_test_videos(
              frame_display_shape=(1200,800)):
     """Video türündeki tüm verileri test  etmeye yarar."""
     datas = []
+    write_project_log("Yığın video test işlemi başlatıldı")
 
     k = int(input("0: Tüm verilerde test 1:Verileri seçerek test  :"))     
     assert k == 0 or k == 1,"Yanlış girdi girildi"
@@ -808,6 +815,8 @@ def batch_test_videos(
             predicted_vid_save_FPS=predicted_vid_save_FPS,
             frame_display_shape=frame_display_shape
             )
+        write_project_log("Veri test edildi: ",data.name)
+
         
 def batch_test_frames(
              test_func:Callable[[list,float,float,int,int],list]=None,
@@ -821,6 +830,8 @@ def batch_test_frames(
     """Frames türündeki tüm verileri test  etmeye yarar."""
     datas = []
 
+    write_project_log("Yığın frames test işlemi başlatıldı")
+
     k = int(input("0: Tüm verilerde test 1:Verileri seçerek test: "))     
     assert k == 0 or k == 1,"Yanlış girdi girildi"
 
@@ -830,6 +841,7 @@ def batch_test_frames(
             data_type = TestData(DATA_PATH + "/" + name).type
             if data_type == 'frames':
                 datas.append(_TestFrames(DATA_PATH + "/" + name))
+        write_project_log("Tüm verilerle test etme seçildi")
     elif k == 1:
         data_names = os.listdir(DATA_PATH)
         for i,name in enumerate(data_names):
@@ -841,6 +853,8 @@ def batch_test_frames(
         for i in inps:
             i = int(i)
             datas.append(_TestFrames(DATA_PATH + "/" + data_names[i]))
+        write_project_log("Şu verilerle test etme seçildi: ",inp)
+
 
     for data in datas:
         data.test(
@@ -853,12 +867,15 @@ def batch_test_frames(
             save_predicted_frames=save_predicted_frames,
             frame_display_shape=frame_display_shape
             )
+        write_project_log("Veri test edildi: ",data.name)
+    
         
 def batch_test_images(test_func:Callable[[list,str],list,]=None,
                       save_predicted_images=False,
                       save_predicted_objects=False):
     """images türündeki tüm verileri test  etmeye yarar."""
     datas = []
+    write_project_log("Yığın images test işlemi başlatıldı")
 
     k = int(input("0: Tüm verilerde test 1:Verileri seçerek test: "))     
     assert k == 0 or k == 1,"Yanlış girdi girildi"
@@ -869,6 +886,8 @@ def batch_test_images(test_func:Callable[[list,str],list,]=None,
             data_type = TestData(DATA_PATH + "/" + name).type
             if data_type == 'images':
                 datas.append(_TestImages(DATA_PATH + "/" + name))
+        write_project_log("Tüm verilerle test etme seçildi")
+        
     elif k == 1:
         data_names = os.listdir(DATA_PATH)
         for i,name in enumerate(data_names):
@@ -880,11 +899,79 @@ def batch_test_images(test_func:Callable[[list,str],list,]=None,
         for i in inps:
             i = int(i)
             datas.append(_TestImages(DATA_PATH + "/" + data_names[i]))
+        write_project_log("Şu verilerle test etme seçildi: ",inp)
+        
     for data in datas:
         data.test(
             test_func=test_func,
             save_predicted_objects=save_predicted_objects,
             save_predicted_images=save_predicted_images
             )
+        write_project_log("Veri test edildi: ",data.name)
         
 
+
+def write_project_log(*text):
+    """project_logs.txt dosyasına log ekler"""
+    full_text = date_string + " " + " ".join(text)
+    os.path.dirname(os.path.abspath(__file__))
+    with open(MAIN_PATH + "/" + "project_logs.txt","a") as file:
+        file.write(full_text+ "\n")
+
+
+
+def conjugate_videos(paths:list,save_dir,monitor_shape=(1920,1360,3)):
+    """
+    Verilen yollardaki videoları tek bir video haline getirerek kaydeder. İndex ile eşler.
+    input:
+        paths: list[str]
+            Video yolları
+        save_dir: str
+            Kaydetme yolu
+        momitor_shape: [int,int,int]
+            kaydedilecek videonun (genişlik,yükseklik,kanal)
+    """
+    caps = [cv2.VideoCapture(path) for path in paths]
+    slice_number = 2
+    if len(paths) % 2 == 0:
+        slice_number = len(paths)
+    else:
+        slice_number = len(paths)+1
+
+    slice_height = int(monitor_shape[1] / 2)
+    slice_width = int(monitor_shape[0] / (slice_number/2))
+    monitor = np.zeros((monitor_shape[1],monitor_shape[0],monitor_shape[2]))
+    print(monitor.shape)
+    print("Dilim: h,w",slice_height,slice_width)
+    print("Dilim sayısı: ",slice_number)
+
+    vid_save = cv2.VideoWriter(
+        save_dir + "/" + 'conjugated_video.avi' ,  
+        cv2.VideoWriter_fourcc(*'XVID'), 
+        30, 
+        monitor_shape[:2]) 
+    status = True
+    frame_counter = 0
+    while status:
+        print("frame "+ str(frame_counter),end="\r")
+        
+        for i,cap in enumerate(caps):
+            ret,frame = cap.read()
+            
+            if ret:
+                frame = cv2.resize(frame,(slice_width,slice_height))
+                cv2.putText(frame,paths[i].split("/")[-1],(10,30),cv2.FONT_HERSHEY_DUPLEX,0.8,(255,0,0))
+                cv2.putText(frame,str(frame_counter),(10,80),cv2.FONT_HERSHEY_DUPLEX,0.8,(255,0,0))
+                y = i % 2 
+                x = i // 2
+                monitor[y*slice_height:y*slice_height+slice_height,x*slice_width:x*slice_width+slice_width] = frame
+            else:
+                print("Yeni frame okunamadı")
+                status = False
+                break
+        vid_save.write(monitor.astype('uint8'))
+        frame_counter += 1
+                
+    cv2.destroyAllWindows()
+
+    vid_save.release()

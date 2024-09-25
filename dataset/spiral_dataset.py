@@ -1,7 +1,7 @@
 from spiral_events.tools.utils import path_sequence
 import os
-from .spiral_data import SpiralData
-from .utils import add_log
+from spiral_data import SpiralData
+from utils import add_log
 from tqdm import tqdm
 import numpy as np
 
@@ -125,7 +125,7 @@ class SpiralDataset:
 
     def augment(self,min_angle,max_angle):
         import random
-        from .spiral_data_organization import create_dataset
+        from spiral_data_organization import create_dataset
 
         aug_name =f"{self.name}_aug_r_{min_angle}_{max_angle}"
         create_dataset(aug_name)

@@ -1,9 +1,7 @@
 from spiral_events.tools.utils import path_sequence, get_screen_resolution
-from .spiral_dataset import SpiralDataset
-from .spiral_data import SpiralData
+from spiral_dataset import SpiralDataset
+from spiral_data import SpiralData
 from spiral_events.monitor_helper import SpiralMonitorHelper
-from .spiral_dataset_object import SpiralDatasetObject
-from spiral_events.tools.utils import format_line
 from spiral_events.tools.utils import show_pie
 import os
 import yaml
