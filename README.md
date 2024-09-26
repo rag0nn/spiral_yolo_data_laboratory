@@ -20,10 +20,11 @@
       <p>---utils.py: Scripts for the dataset processes</p>
       <p><b>Models folder</b></p>
       <p>---It includes yolo models</p>
+      <p>---GUI.py: You can do transactions with GUI. Just run with python</p>
       <p><b>Test Folder</b></p>
       <p>---data: It is where test datas. 3 data type for the use. They are 'video','frames' and 'images'. You can choose for your data type</p>
       <p>---apply.py: Scripts for the test processes. You can start with create_data() function</p>
-      <p>---GUI.py: You can do transactions with GUI. Just run with python</p>
+      
 </details>
 <div>
       <summary>LICENSE</summary>
