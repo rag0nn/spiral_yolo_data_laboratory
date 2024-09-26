@@ -24,7 +24,9 @@
       <p>---data: It is where test datas. 3 data type for the use. They are 'video','frames' and 'images'. You can choose for your data type</p>
       <p>---apply.py: Scripts for the test processes. You can start with create_data() function</p>
 </details>
-<div><p>---License: This project is licensed under the MIT License. For more details, please refer to the LICENSE file </p></div>
+<div>
+      <summary>LICENSE</summary>
+      <p> This project is licensed under the MIT License. For more details, please refer to the LICENSE file </p></div>
 </div>
 
 
