@@ -16,6 +16,10 @@ class Section(QWidget):
         if self._scroll:
             self.scroll_area = QScrollArea()
             self.scroll_area.setWidgetResizable(True)
+            self.scroll_area.setStyleSheet("""QScrollBar:vertical {
+                background: #7c7c7c;
+                width: 15px;
+            }""")
             
             self.content_widget = QWidget()  # Scroll alanı için içerik widget'ı
             self.layout2 = QVBoxLayout()  # İçerik için ayrı layout

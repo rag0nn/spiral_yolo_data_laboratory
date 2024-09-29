@@ -39,6 +39,7 @@ class MainWindow(QMainWindow):
 
         root_widget = QWidget()
         self.setCentralWidget(root_widget)
+        root_widget.setStyleSheet("background-color:#d2d2d2")
 
         root_layout = QHBoxLayout()
         
