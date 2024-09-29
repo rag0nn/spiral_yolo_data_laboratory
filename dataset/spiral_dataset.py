@@ -158,6 +158,30 @@ class SpiralDataset:
             
         add_log(f'{self.name} frame yeniden boyutlandırma: {newsize_value}')
 
+    def slice(self,slice_width,slice_height,cover_objectless_datas=False):
+        from spiral_data_organization import create_dataset
+        new_name =f"{self.name}_sliced"
+        create_dataset(new_name)
+        
+        datas = self.get_datas()
+
+        for data in tqdm(datas):
+            data:SpiralData
+            
+            im_name_parts = data.image_path.split("/")
+            im_name_parts[-5] = new_name
+            new_im_path = "/".join(im_name_parts[:-1])
+
+            txt_name_parts = data.txt_path.split("/")
+            txt_name_parts[-5] = new_name
+            new_txt_path = "/".join(txt_name_parts[:-1])
+
+            data.slice(
+                slice_width,slice_height,
+                new_im_path,new_txt_path,
+                cover_objectless_data=cover_objectless_datas,info=False)
+        add_log(f'{self.name} veri dilimleme: slice w,h{slice_width,slice_height}')
+
     def apply_train_test_split(self,train=0.6,val=0.25):
         """
         Etiket sayısına göre veri setini train test val olarak ayırır.

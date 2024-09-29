@@ -1,5 +1,5 @@
 from PyQt6.QtWidgets import QWidget, QVBoxLayout, QScrollArea, QMessageBox
-
+from PyQt6.QtCore import Qt
 class Section(QWidget):
     def __init__(self, children, scroll=False):
         super().__init__()

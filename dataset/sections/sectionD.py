@@ -1,5 +1,5 @@
 from PyQt6.QtGui import QGuiApplication, QStandardItem, QStandardItemModel
-from PyQt6.QtWidgets import QWidget,QLabel, QPlainTextEdit, QPushButton, QTableView, QVBoxLayout
+from PyQt6.QtWidgets import QHBoxLayout, QWidget,QCheckBox,QLabel, QPlainTextEdit, QPushButton, QTableView, QVBoxLayout
 from .section import Section
 
 class _Button(QPushButton):
@@ -30,12 +30,13 @@ class SectionD(Section):
         self.title = QLabel(self.language.sectionD["title"])
         self.table_view = QTableView()
         self.output_area = QPlainTextEdit()
+        self.btn_slice = _DatasetOptionsButton(self.language.sectionD["btn_slice"],self.slice_datas)
         self.btn_convert_labels = _DatasetOptionsButton(self.language.sectionD["btn_convert_labels"],self.convert_labels)
         self.btn_train_test_split = _DatasetOptionsButton(self.language.sectionD["btn_train_test_split"],self.train_test_split)
         self.btn_resizes_frame = _DatasetOptionsButton(self.language.sectionD["btn_resize_frames"],self.resize_frames)
         self.btn_augment = _DatasetOptionsButton(self.language.sectionD["btn_btn_augment"],self.augment)
 
-        for widget in [self.title,self.table_view,self.output_area,self.btn_convert_labels,self.btn_train_test_split,self.btn_resizes_frame,self.btn_augment]:
+        for widget in [self.title,self.table_view,self.output_area,self.btn_slice,self.btn_convert_labels,self.btn_train_test_split,self.btn_resizes_frame,self.btn_augment]:
             children.append(widget)
 
         super().__init__(children=children)
@@ -147,7 +148,7 @@ class SectionD(Section):
                 input2 = float(text2.toPlainText())
 
                 self.dataset.augment(int(input1),int(input2))
-                self.output_area.setPlainText(self.language.sectionD["aug_3"]+str(input1)+ " test "+ str(input2))
+                self.output_area.setPlainText(self.language.sectionD["aug_3"]+str(input1))
                 self.window.close()
             else:
                 self.output_area.setPlainText(self.language.sectionD["aug_4"])
@@ -164,6 +165,41 @@ class SectionD(Section):
         lyt.addWidget(label)
         lyt.addWidget(text)
         lyt.addWidget(text2)
+        lyt.addWidget(btn)
+        self.window.setLayout(lyt)
+        self.window.show()
+
+    def slice_datas(self):
+        def save():
+            if self.dataset is not None:
+                input1 = int(text.toPlainText())
+                input2 = int(text2.toPlainText())
+
+                self.dataset.slice(input1,input2,chkbox.isChecked())
+                self.output_area.setPlainText(self.language.sectionD["sli_3"])
+                self.window.close()
+            else:
+                self.output_area.setPlainText(self.language.sectionD["sli_4"])
+                self.window.close()
+        
+        self.window = QWidget()
+        lyt = QVBoxLayout()
+        label = QLabel(self.language.sectionD["sli_1"])
+        text = QPlainTextEdit()
+        text2 = QPlainTextEdit()
+        text.setMaximumHeight(40)
+        text2.setMaximumHeight(40)
+        h_layout = QHBoxLayout()
+        lbl = QLabel(self.language.sectionD["sli_5"])
+        chkbox =  QCheckBox()
+        chkbox.setChecked(False)
+        h_layout.addWidget(lbl)
+        h_layout.addWidget(chkbox)
+        btn = _Button(self.language.sectionD["sli_2"],save)
+        lyt.addWidget(label)
+        lyt.addWidget(text)
+        lyt.addWidget(text2)
+        lyt.addLayout(h_layout)
         lyt.addWidget(btn)
         self.window.setLayout(lyt)
         self.window.show()

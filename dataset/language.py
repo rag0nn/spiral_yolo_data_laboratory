@@ -34,6 +34,7 @@ class TR:
 
     sectionD = {
         "title" : "Veri seti analizleri",
+        "btn_slice": "Verileri dilimle",
         "btn_convert_labels":"Etiketleri dönüştür",
         "btn_train_test_split":"Eğitim Test Ayırımı Uygula",
         "btn_resize_frames":"Görselleri Yeniden Boyutlandır",
@@ -57,7 +58,16 @@ class TR:
         "aug_1":"Verilen açı aralığında rastgele açılar ile verilere döndürme işlemi uygulayarak çoğaltır\n Örnek kullım: 10,20",
         "aug_2":"Dönüştür",
         "aug_3":"Çoğaltma işlemi başarılı",
-        "aug_4":"Seçili veri seti yok",    
+        "aug_4":"Seçili veri seti yok", 
+
+        "sli_1":"Dilimlerin genişliği ve yüksekliğini seçin", 
+        "sli_2":"Uygula", 
+        "sli_3":"Dilimleme işlemi başarılı ", 
+        "sli_4":"Seçili veri seti yok", 
+        "sli_5":"Objesiz verileri koru", 
+
+        
+          
     }
 
     sectionE = {
@@ -82,6 +92,7 @@ class TR:
         "re_2":"Sil",
         "re_3":"Silme işlemi başarılı ",
         "re_4":"Seçili veri yok",
+        
     }
 
 
@@ -104,6 +115,7 @@ class EN:
 
     sectionD = {
         "title": "Dataset Analyses",
+        "btn_slice": "Slice Datas",
         "btn_convert_labels": "Convert Labels",
         "btn_train_test_split": "Apply Train-Test Split",
         "btn_resize_frames": "Resize Images",
@@ -128,6 +140,12 @@ class EN:
         "aug_2": "Convert",
         "aug_3": "Augmentation operation successful",
         "aug_4": "No selected dataset",
+
+        "sli_1":"Set slice width and height", 
+        "sli_2":"Apply", 
+        "sli_3":"Slice operation successful", 
+        "sli_4":"No selected dataset", 
+        "sli_5":"Cover objectless datas", 
     }
 
     sectionE = {
