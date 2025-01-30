@@ -1,6 +1,6 @@
 
 <div>
-      <h1>SpirAi YOLO Data Laboratory</h1>
+      <h1>SpirAl YOLO Data Laboratory</h1>
   <div>
     <h3>What is The SpirAi Data Lab?</h3>
     <p>Te library provides Dataset collecting, converting, testing and Model testing on videos, frames, images practically. </p>
