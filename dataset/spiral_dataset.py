@@ -1,4 +1,4 @@
-from spiral_events.tools.utils import path_sequence
+from tools.utils import path_sequence
 import os
 from spiral_data import SpiralData
 from utils import add_log
@@ -159,7 +159,7 @@ class SpiralDataset:
         add_log(f'{self.name} frame yeniden boyutlandırma: {newsize_value}')
 
     def slice(self,slice_width,slice_height,cover_objectless_datas=False):
-        from spiral_data_organization import create_dataset
+        from  spiral_data_organization import create_dataset
         new_name =f"{self.name}_sliced"
         create_dataset(new_name)
         

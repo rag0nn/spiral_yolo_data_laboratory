@@ -8,7 +8,7 @@ class Section(QWidget):
         self.setStyleSheet(f"""
                 border: 2px solid black;  /* Tek çerçeve */
                 padding: 1px;                    /* İç boşluk */
-                background-color: white;
+                background-color: gray;
             """)
         
         self.layout_ = QVBoxLayout()  # Ana layout

@@ -1,5 +1,5 @@
 from IPython.display import clear_output
-from spiral_events.tools.utils import path_sequence
+from tools.utils import path_sequence
 import os
 from datetime import datetime
 

@@ -1,5 +1,5 @@
-from spiral_events.tools.constants import label_dict
-from spiral_events.object_detection.object import SpiralObject
+from tools.constants import label_dict
+from spiral_object import SpiralObject
 
 class SpiralDatasetObject:
 

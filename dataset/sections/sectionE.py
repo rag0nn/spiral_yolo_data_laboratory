@@ -24,6 +24,7 @@ class _ManupilationButon(QPushButton):
 class _DirectionButton(QPushButton):
     def __init__(self,text,click_func):
         self.text = text
+        
         self.click_func = click_func
         super().__init__(self.text)
         self.clicked.connect(self.click)
@@ -33,16 +34,20 @@ class _DirectionButton(QPushButton):
         
 class SectionE(Section):
     def __init__(self,language,func_remove_data,func_forward,func_backward,func_paint_objects,func_switch_language,data = None):
+        
+        print("a")
         self.data = data
         self.language = language
         self.func_remove_data = func_remove_data
         self.func_forward = func_forward
         self.func_backward = func_backward
         self.func_paint_objects = func_paint_objects
-
+        print("b")
+        
         self.h_widget = QWidget()
         self.h_layout = QHBoxLayout()
 
+        print("c")
         self.manupilation_widget = QWidget()
         self.manupilation_layout = QVBoxLayout()
         self.title = QLabel(self.language.sectionE["title"])
@@ -55,23 +60,43 @@ class SectionE(Section):
             self.manupilation_layout.addWidget(widget)
         self.manupilation_widget.setLayout(self.manupilation_layout)
 
+        print("d")
         self.direction_widget = QWidget()
+        print("T1")
         self.btn_direction_left = _DirectionButton("<",self.func_backward)
+        print("T2")
         self.btn_direction_right = _DirectionButton(">",self.func_forward)
+        print("T2")
+        
         self.paint_objects_checkbox = QCheckBox()
+        print("T2")
+        
         self.paint_objects_checkbox.setMaximumWidth(20)
+        print("T3")
+        
         self.paint_objects_checkbox.stateChanged.connect(self.func_paint_objects)
-        self.paint_objects_checkbox.setChecked(True)
+        print("T4")
+        
+        #self.paint_objects_checkbox.setChecked(True)
+        print("T5")
+        
         self.paint_objects_text = QLabel(self.language.sectionE["lbl_po"])
+        print("T6")
+        
         self.btn_language = _Button(self.language.sectionE["btn_switch"],func_switch_language)
 
+        print("e")
         layout_direction_buttons = QHBoxLayout()
         layout_direction_buttons.addWidget(self.btn_direction_left)
         layout_direction_buttons.addWidget(self.btn_direction_right)
 
+        print("f")
+
         layout_paint_objects = QHBoxLayout()
         layout_paint_objects.addWidget(self.paint_objects_text)
         layout_paint_objects.addWidget(self.paint_objects_checkbox)
+
+        print("g")
 
         v_layout = QVBoxLayout()
         v_layout.addLayout(layout_paint_objects)
@@ -79,11 +104,14 @@ class SectionE(Section):
         v_layout.addWidget(self.btn_language)
         self.direction_widget.setLayout(v_layout)
 
+        print("h")
+
         self.h_layout.addWidget(self.manupilation_widget)
         self.h_layout.addWidget(self.direction_widget)
         self.manupilation_widget.setMaximumWidth(int(QGuiApplication.primaryScreen().geometry().height()*0.5))
         self.h_widget.setLayout(self.h_layout)
-        
+
+        print("Section e initialized")
         super().__init__(children=[self.h_widget])
         self.setMaximumHeight(int(QGuiApplication.primaryScreen().geometry().height()*0.4))
         

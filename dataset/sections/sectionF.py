@@ -21,6 +21,7 @@ class _ImagePathButton(QPushButton):
 class SectionF(Section):
     def __init__(self):
         self.buttons = []
+        print("F Section Initialized")
         super().__init__(children=[QLabel("Section F")],scroll=True)
 
     def load_im_path_buttons(self,datas,func_change_data):

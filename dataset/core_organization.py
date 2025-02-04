@@ -1,7 +1,7 @@
 import os
-from spiral_events.tools.utils import path_sequence, yaml
+from tools.utils import path_sequence, yaml
 from spiral_dataset import SpiralDataset
-from spiral_events.tools.utils import show_pie
+from tools.utils import show_pie
 import pandas as pd
 import matplotlib.pyplot as plt
 import shutil

@@ -1,7 +1,7 @@
 from PyQt6.QtWidgets import QApplication, QMainWindow,QWidget,QVBoxLayout, QHBoxLayout
 from PyQt6.QtGui import QGuiApplication, QPixmap,QImage
 from spiral_dataset import SpiralDataset
-from spiral_events.monitor_helper import SpiralMonitorHelper
+from monitor_helper import SpiralMonitorHelper
 from core_organization import create_dataset, analysis, merge_datasets
 import sys
 import os 
@@ -24,6 +24,7 @@ class MainWindow(QMainWindow):
         self.initUi()
 
     def initUi(self):
+        print("Initializing UI...")  # Deb
         dataset_names = self._get_ds_names()
         self.chosen_ds_name = ""
         self.chosen_ds = None
@@ -33,7 +34,6 @@ class MainWindow(QMainWindow):
         self.paint_objects_ = False
 
         
-        ####
         # Pencere başlığı
         self.setWindowTitle("Spiral Dataset Laboratuary")
 
@@ -47,7 +47,6 @@ class MainWindow(QMainWindow):
         column1_layout = QVBoxLayout()
         column2_layout = QVBoxLayout()
         column3_layout = QVBoxLayout()
-
 
         self.sectC=SectionC()
         self.sectA=SectionA(dataset_names,self.change_dataset)
@@ -83,6 +82,7 @@ class MainWindow(QMainWindow):
         root_layout.setContentsMargins(0, 0, 0, 0)  # Ana layout'un kenar boşluklarını sıfırla
         root_layout.setSpacing(0)  # 
         root_widget.setLayout(root_layout)
+        print("self.sections initialized!")
 
     def _get_ds_names(self): 
         ds_list = os.listdir(FILE_PATH + "/datasets")

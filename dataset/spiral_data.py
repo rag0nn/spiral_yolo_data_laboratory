@@ -1,6 +1,6 @@
 import cv2
 import numpy as np
-from spiral_events.object_detection.object import SpiralObject
+from spiral_object import SpiralObject
 import os
 import warnings
 

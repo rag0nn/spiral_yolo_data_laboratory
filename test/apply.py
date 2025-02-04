@@ -4,7 +4,7 @@ import cv2
 from typing import Callable
 from datetime import datetime   
 import pandas as pd
-from spiral_events.object_detection.object import SpiralObject
+from ..dataset.spiral_object import SpiralObject
 from IPython.display import clear_output
 import shutil
 import numpy as np

@@ -1,8 +1,8 @@
-from spiral_events.tools.utils import path_sequence, get_screen_resolution
+from tools.utils import path_sequence, get_screen_resolution
 from spiral_dataset import SpiralDataset
 from spiral_data import SpiralData
 from spiral_events.monitor_helper import SpiralMonitorHelper
-from spiral_events.tools.utils import show_pie
+from tools.utils import show_pie
 import os
 import yaml
 import pandas as pd 

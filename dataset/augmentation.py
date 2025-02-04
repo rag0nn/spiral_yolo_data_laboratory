@@ -1,7 +1,7 @@
-from tensorflow.image import adjust_saturation, adjust_brightness, rot90
+from tensorflow.image import adjust_saturation, adjust_brightness, rot90   # ignore 
 import cv2
 import numpy as np
-from spiral_lab.dataset.spiral_dataset_object import SpiralDatasetObject
+from spiral_dataset_object import SpiralDatasetObject
 
 def filter_saturation(image,factor=1.25):
     """
