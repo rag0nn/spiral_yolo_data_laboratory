@@ -205,110 +205,89 @@ class SpiralData:
             print("Veri çoğaltma işlemi gerçekleştirildi")
         else:
             print(self.data_name, "Çoğaltma sonucunda görselde obje kalmadığı için çoğaltma işlemi gerçekleştirilemedi")
+          
+    def slice(self,slice_width:int,slice_height:int,im_save_path:str,txt_save_path:str,cover_objectless_data=False,info=False):
+        
+        def _get_slice_coordinates(image,slice_width,slice_height):
+            height,width,_ = image.shape
+            
+            tl_slices = (0,slice_height,0,slice_width)
+            tr_slices = (0,slice_height,width-slice_width,width)
+            bl_slices = (height-slice_height,height,0,slice_width)
+            br_slices = (height-slice_height,height,width-slice_width,width)
+                        
+            return [tl_slices,tr_slices,bl_slices,br_slices]
+            
+        def _slice_objects(slice_coordinates,objects):
+            objs = []
+            for y1,y2,x1,x2 in slice_coordinates:
+                slice_objs = []
+                for obj in objects:
+                    new_obj = SpiralObject(obj.label_idx,obj.conf,obj.x1,obj.y1,obj.x2,obj.y2)
+                    new_obj.x1,new_obj.y1,new_obj.x2,new_obj.y2 = int(new_obj.x1), int(new_obj.y1),int(new_obj.x2),int(new_obj.y2)
 
-    def slice(self,slice_width:int,slice_height:int,im_save_path,txt_save_path,cover_objectless_data=False,info=True):
+                    if new_obj.x1 > x2 or new_obj.x2 < x1 or new_obj.y1 > y2 or new_obj.y2 < y1:
+                        pass
+                    else:
+                        if new_obj.x1 < x1 :
+                            new_obj.x1 = x1
+
+                        if  new_obj.x2 > x2:
+                            new_obj.x2 = x2
+                        
+                        if new_obj.y1 < y1:
+                            new_obj.y1 = y1
+                        
+                        if new_obj.y2 > y2:
+                            new_obj.y2 = y2
+                        
+                        if new_obj.x1 == x1 and new_obj.y1 == y1 and new_obj.x2 == x2 and new_obj.y2 == y2:
+                            pass
+                        else:
+                            if (new_obj.x2-new_obj.x1) * (new_obj.y2-new_obj.y1) > 1000 and (new_obj.x2-new_obj.x1) > 50 and (new_obj.y2-new_obj.y1) > 50:
+                                new_obj.x1 -= x1
+                                new_obj.x2 -= x1
+                                new_obj.y1 -= y1
+                                new_obj.y2 -= y1
+                                slice_objs.append(new_obj)
+                            
+                objs.append(slice_objs)
+                
+            return objs
+                                    
         image = cv2.imread(self.image_path)
         objects = self.get_as_absoluate_coordinates(image.shape)
-       
+
         # Checks
         assert isinstance(image, np.ndarray), TypeError(f"Expected np.ndarray but got {type(image)}")
-        height,width,channel = image.shape
+        height,width,_ = image.shape
         if slice_width < width / 2: warnings.warn("Slice width shorter than half of image width. Could be pixel missings",UserWarning)
         if slice_height < height / 2: warnings.warn("Slice height shorter than half of image height. Could be pixel missings",UserWarning)
         intersection_width = max(0, slice_width * 2 - width)
         intersection_height = max(0, slice_height * 2 - height)
-        assert slice_width < width, "slice width bigger than image width"
-        assert slice_height < height, "slice height bigger than image height"
+        assert slice_width < width, f"slice width bigger than image width slice_width:{slice_width} image_width:{width} name:{self.data_name}"
+        assert slice_height < height, f"slice height bigger than image height slice_height:{slice_height} image_height:{height} name:{self.data_name}"
         if info:
             print("İntersection width: ",intersection_width) 
             print("İntersection height: ",intersection_height)
-
-        # slice coordinates region:[(x1,y1),(x2,y2),(relative_x,relative_y)]
-        slice_coordinates = {
-            "top_left":[(0,0),(slice_width,slice_height),(0,0)],
-            "top_right":[(width-slice_width,0),(width,slice_height),(width-slice_width,0)],
-            "bottom_left":[(0,height-slice_height),(slice_width,height),(0,height-slice_height)],
-            "bottom_right":[(width-slice_width,height-slice_height),(width,height),(width-slice_width,height-slice_height)],
-        }
-
-        results = {}
-
-        for key,[(slice_x1,slice_y1),(slice_x2,slice_y2),(relative_x,relative_y)] in slice_coordinates.items():
-            sliced_image = image[slice_y1:slice_y2,slice_x1:slice_x2]
-            res_objects = []
-
-            for obj in objects:
-                obj:SpiralObject
-
-                res_obj_x1,res_obj_y1,res_obj_x2,res_obj_y2 = None,None,None,None
-
-                decisions = [False,False,False,False]
-                for index,(i,j) in enumerate([(obj.x1,obj.y1),(obj.x2,obj.y1),(obj.x1,obj.y2),(obj.x2,obj.y2)]):
-                    if slice_x1 < i and i < slice_x2 and slice_y1 < j and j < slice_y2: decisions[index] = True
-                        
-                num_decision_true = decisions.count(True)
-                if num_decision_true == 4:
-                    res_obj_x1,res_obj_y1,res_obj_x2,res_obj_y2 = obj.x1,obj.y1,obj.x2,obj.y2
-                elif num_decision_true == 2:
-                    if decisions == [True,True,False,False]:
-                        res_obj_x1,res_obj_y1 = obj.x1,obj.y1
-                        res_obj_x2,res_obj_y2 = obj.x2,slice_y2
-                    elif decisions == [True,False,True,False]:
-                        res_obj_x1,res_obj_y1 = obj.x1,obj.y1
-                        res_obj_x2,res_obj_y2 = slice_x2,obj.y2
-                    elif decisions == [False,True,False,True]:
-                        res_obj_x1,res_obj_y1 = slice_x1,obj.y1
-                        res_obj_x2,res_obj_y2 = obj.x2,obj.y2
-                    elif decisions == [False,False,True,True]:
-                        res_obj_x1,res_obj_y1 = obj.x1,slice_y1
-                        res_obj_x2,res_obj_y2 = obj.x2,obj.y2
-                    else:
-                        raise Exception(f"Logical Error{decisions} ,num_true: {num_decision_true}")
-                elif num_decision_true == 1:
-                    if decisions == [True,False,False,False]:
-                        res_obj_x1,res_obj_y1 = obj.x1,obj.y1
-                        res_obj_x2,res_obj_y2 = slice_x2,slice_y2
-                    elif decisions == [False,True,False,False]:
-                        res_obj_x1,res_obj_y1 = slice_x1,obj.y1
-                        res_obj_x2,res_obj_y2 = obj.x2,slice_y2
-                    elif decisions == [False,False,True,False]:
-                        res_obj_x1,res_obj_y1 = obj.x1,slice_y1
-                        res_obj_x2,res_obj_y2 = slice_x2,obj.y2
-                    elif decisions == [False,False,False,True]:
-                        res_obj_x1,res_obj_y1 = slice_x1,slice_y1
-                        res_obj_x2,res_obj_y2 = obj.x2,obj.y2
-                elif num_decision_true == 0:
-                    pass
-                else:
-                    raise Exception(f"Num decision True equal to {num_decision_true}")
-                if num_decision_true != 0:
-                    res_objects.append(
-                        SpiralObject(
-                            label_index=obj.label_idx,
-                            confidence=obj.conf,
-                            x1=res_obj_x1-relative_x,y1=res_obj_y1-relative_y,
-                            x2=res_obj_x2-relative_x,y2=res_obj_y2-relative_y
-                        )
-                    )
-            results[key] = (sliced_image,res_objects)
+            
+            
+        slice_coordinates = _get_slice_coordinates(image,slice_width,slice_height)
         
-        for key, (im,objs) in results.items():
+        image_slices = [image[a:b,c:d] for a,b,c,d in slice_coordinates]
+        sliced_objects = _slice_objects(slice_coordinates,objects)
+        
+        topics = ["top_left","top_right","bottom_left","bottom_right"]
+        for i, image,objs in zip(range(len(image_slices)),image_slices,sliced_objects):
             if (len(objs) == 0 and cover_objectless_data == True) or len(objs) > 0:
-                cv2.imwrite(im_save_path + "/" + self.data_name + "_" + key +".jpg",im)
-                f = open(txt_save_path + "/" + self.data_name + "_" + key +".txt","w")
+                
+                cv2.imwrite(im_save_path + "/" + topics[i] + "_" + self.data_name + ".jpg" ,image)
+                f = open(txt_save_path + "/" + topics[i] + "_" + self.data_name +".txt","w")
                 for obj in objs:
                     cx = (obj.x1 + obj.x2) / 2 / slice_width
                     cy = (obj.y1 + obj.y2) / 2 / slice_height
                     cw = (obj.x2-obj.x1) / slice_width
                     ch = (obj.y2-obj.y1) / slice_height 
-                    f.writelines(f"{obj.label_idx} {cx} {cy} {cw} {ch}")
+                    f.write(f"{obj.label_idx} {cx} {cy} {cw} {ch}\n")
                 f.close()
-
-        return results            
-
-                
-                
-
-
-
-
+            

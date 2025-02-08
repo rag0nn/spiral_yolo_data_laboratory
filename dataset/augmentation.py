@@ -1,4 +1,4 @@
-from tensorflow.image import adjust_saturation, adjust_brightness, rot90   # ignore 
+from tensorflow.image import adjust_saturation, adjust_brightness, rot90   # type: ignore
 import cv2
 import numpy as np
 from spiral_dataset_object import SpiralDatasetObject

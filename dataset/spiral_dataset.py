@@ -233,6 +233,8 @@ class SpiralDataset:
 
         train_paths,test_paths,val_paths = [],[],[]
         train_counts,test_counts,val_counts = [0,0,0,0],[0,0,0,0],[0,0,0,0]
+        np.random.shuffle(self.image_paths)
+        np.random.shuffle(self.txt_paths)
         for im_path,txt_path in zip(self.image_paths,self.txt_paths):
             cof,food = find_feeding(SpiralData(im_path,txt_path))
             primary_food_index = cof.argmax()
