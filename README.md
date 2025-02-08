@@ -26,6 +26,10 @@
       <p>---apply.py: Scripts for the test processes. You can start with create_data() function</p>
       
 </details>
+
+<div>
+      <img src="https://github.com/rag0nn/spiral_yolo_data_laboratory/blob/main/monitor.png" width=auto>
+</div>
 <div>
       <summary>LICENSE</summary>
       <p> This project is licensed under the MIT License. For more details, please refer to the LICENSE file </p></div>
