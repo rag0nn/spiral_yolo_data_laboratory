@@ -11,6 +11,9 @@
             <p>It can be added as a local library or can be used by cloning this repo and importing it with a py file in its parent directory.</p>   
             <p>For dataset processes you can use scripts in datasets folder<, for testing you can use test folder. The models folder is for the YOLO models/p>
        </details>
+      <div>
+      <img src="https://github.com/rag0nn/spiral_yolo_data_laboratory/blob/main/monitor.png" width=auto>
+</div>
   </div>
 <details open>
       <summary>🌲 File and Class Hieararchy</summary>
@@ -27,9 +30,7 @@
       
 </details>
 
-<div>
-      <img src="https://github.com/rag0nn/spiral_yolo_data_laboratory/blob/main/monitor.png" width=auto>
-</div>
+
 <div>
       <summary>LICENSE</summary>
       <p> This project is licensed under the MIT License. For more details, please refer to the LICENSE file </p></div>
