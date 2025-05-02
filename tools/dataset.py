@@ -46,11 +46,15 @@ class SpiralDataset:
         im_names = []
         txt_names = []
         problems = []
-        for im_path,txt_path in zip(self.image_paths,self.txt_paths):
+        
+        for im_path in self.image_paths:
             im_name = im_path.split("/")[-1].split(".")[-2]
             im_names.append(im_name)
+            
+        for txt_path in self.txt_paths:
             txt_name = txt_path.split("/")[-1].split(".")[-2]
-            txt_names.append(txt_name)
+            txt_names.append(txt_name)    
+            
         for im_name in tqdm(im_names):
             if im_name not in txt_names:
                 problems.append(f"image {im_name}")

@@ -163,9 +163,5 @@ def convert_contours_to_seq(contours):
             contours_.append(point)
     return np.array(contours_)
 
-''' # Kütüphaneini yüklenmesi gerek!
-def voc2yolo(xml_files_path):
-     from pylabel import importer
-     dataset = importer.ImportVOC(path=xml_files_path)
-     dataset.export.ExportToYoloV5()
-'''
+
+

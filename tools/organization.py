@@ -1,7 +1,6 @@
 import os
-from .utils import path_sequence
-from tools.dataset import SpiralDataset
-from .utils import show_pie
+from .utils import path_sequence,show_pie
+from .dataset import SpiralDataset
 import yaml
 import pandas as pd
 import matplotlib.pyplot as plt
