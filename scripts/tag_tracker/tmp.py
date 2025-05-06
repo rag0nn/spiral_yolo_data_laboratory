@@ -19,9 +19,9 @@ class ProcessEnum(Enum):
     ADD_OBJ = "x"
     CHANGE_LABEL = "v"
     ADD_IGNOREAREA = "m"
-    TRACK_AREAS= "n"
+    TRACK_IGNORED= "n"
     AUTO_PRED =  "u"
-    ADD_FOCUSAREA = "b"
+    ADD_FOCUSAREA = "h"
     
     @staticmethod
     def info():
@@ -157,6 +157,46 @@ class TagTracker:
         self.objects[self.index].clear()
         self.ignores[self.index].clear()
         
+    def track_objects(self):
+
+        def _get_tracker(frame, bbox):
+            params = cv2.TrackerNano_Params()
+            params.backbone = self.track_backbone_path
+            params.neckhead = self.track_neckhead_path  # HATA BURADAYDI
+            tracker = cv2.TrackerNano_create(params)
+            tracker.init(frame, bbox)
+            return tracker
+
+        # previous data
+        prev_im = self.image_datas[self.index_prev].get_image
+        prev_objs = self.objects[self.index_prev]
+        frame_height,frame_width,_ = prev_im.shape
+        
+        # tracker init
+        trackers = []
+        for obj in prev_objs:
+            obj:Object
+            c_obj = deepcopy(obj)
+            c_obj.to_absolute(frame_width,frame_height)
+            
+            x,y,w,h = int(c_obj.x1),int( c_obj.y1), int(c_obj.x2 -c_obj.x1), int(c_obj.y2 - c_obj.y1)
+            tracker = _get_tracker(prev_im,[x,y,w,h])
+            trackers.append((tracker,c_obj.label))
+            
+        # current data
+        im = self.image_datas[self.index].get_image
+        for tracker, lbl in trackers:
+            success, bbox = tracker.update(im)
+            if success:
+                x, y, w, h = [int(v) for v in bbox]
+                x1,y1,x2,y2 = x,y,x+w,y+h
+                if x1 <= 0 or y1 <= 0 or x2 >= frame_width or y2 >= frame_height:
+                    logging.warning("Tracking passed, box intersects with borders")
+                    continue
+                o = Object.fromStringXYXYI(f"{lbl} {x1} {y1} {x2} {y2}",frame_width,frame_height)
+                o.to_normalized()
+                self.objects[self.index].append(o)
+
     def add_obj(self):
         o = self.get_area()
         self.objects[self.index].append(o)
@@ -183,7 +223,46 @@ class TagTracker:
     def change_chosen_label(self):
         self.chosen_label = int(input("Chosen Label: "))
         
+    def track_ignored_areas(self):
+        def _get_tracker(frame, bbox):
+            params = cv2.TrackerNano_Params()
+            params.backbone = self.track_backbone_path
+            params.neckhead = self.track_neckhead_path  # HATA BURADAYDI
+            tracker = cv2.TrackerNano_create(params)
+            tracker.init(frame, bbox)
+            return tracker
 
+        # previous data
+        prev_im = self.image_datas[self.index_prev].get_image
+        prev_ignores = self.ignores[self.index_prev]
+        frame_height,frame_width,_ = prev_im.shape
+        
+        # tracker init
+        trackers = []
+        for obj in prev_ignores:
+            obj:Object
+            c_obj = deepcopy(obj)
+            c_obj.to_absolute(frame_width,frame_height)
+            
+            x,y,w,h = int(c_obj.x1),int( c_obj.y1), int(c_obj.x2 -c_obj.x1), int(c_obj.y2 - c_obj.y1)
+            tracker = _get_tracker(prev_im,[x,y,w,h])
+            trackers.append((tracker,c_obj.label))
+            
+        # current data
+        im = self.image_datas[self.index].get_image
+        for tracker, lbl in trackers:
+            success, bbox = tracker.update(im)
+        
+            if success:
+                x, y, w, h = [int(v) for v in bbox]
+                x1,y1,x2,y2 = x,y,x+w,y+h
+                
+                if x1 <= 0 or y1 <= 0 or x2 >= frame_width or y2 >= frame_height:
+                    logging.warning("Tracking passed, box intersects with borders")
+                    continue
+                o = Object.fromStringXYXYI(f"{lbl} {x1} {y1} {x2} {y2}",frame_width,frame_height)
+                o.to_normalized()
+                self.ignores[self.index].append(o)
     
     def save_outputs(self):
         for i,im_data in tqdm(enumerate(self.image_datas)):
@@ -232,26 +311,12 @@ class TagTracker:
             cv2.waitKey(wait)
             return None
         return None
-          
-    def track_areas(self):
-        self.tracker.track_areas(
-            self.image_datas[self.index_prev].get_image,
-            self.image_datas[self.index].get_image,
-            self.ignores,
-            self.index_prev,
-            self.index)
+    
+    def track_focus_areas(self):
         self.tracker.track_areas(
             self.image_datas[self.index_prev].get_image,
             self.image_datas[self.index].get_image,
             self.focuses,
-            self.index_prev,
-            self.index)
-
-    def track_objects(self):
-        self.tracker.track_areas(
-            self.image_datas[self.index_prev].get_image,
-            self.image_datas[self.index].get_image,
-            self.objects,
             self.index_prev,
             self.index)
         
@@ -288,8 +353,8 @@ class TagTracker:
                 self.add_obj()
             elif key == ProcessEnum.CHANGE_LABEL:
                 self.change_chosen_label()
-            elif key == ProcessEnum.TRACK_AREAS:
-                self.track_areas()
+            elif key == ProcessEnum.TRACK_IGNORED:
+                self.track_ignored_areas()
             elif key == ProcessEnum.ADD_FOCUSAREA:
                 self.add_focus_area()
             elif key == ProcessEnum.ADD_IGNOREAREA:
@@ -319,7 +384,7 @@ class TagTracker:
             self.detect_objects()
             if not self.objects[self.index]:
                 self.track_objects()
-            self.track_areas()
+            self.track_ignored_areas()
             self.track_focus_areas()
             self.clean_objects_in_ignore_areas()
             
@@ -346,3 +411,46 @@ if __name__ == "__main__":
 
     TagTracker(args.src, args.dst, args.backbone, args.neckhead)
     
+def track_ignored_areas(self,data:list):
+    """
+    data: self.objects or self.ignores or self.focuces
+    """
+    def _get_tracker(frame, bbox):
+        params = cv2.TrackerNano_Params()
+        params.backbone = self.track_backbone_path
+        params.neckhead = self.track_neckhead_path  # HATA BURADAYDI
+        tracker = cv2.TrackerNano_create(params)
+        tracker.init(frame, bbox)
+        return tracker
+
+    # previous data
+    prev_im = self.image_datas[self.index_prev].get_image
+    prev_ignores = self.data[self.index_prev]
+    frame_height,frame_width,_ = prev_im.shape
+    
+    # tracker init
+    trackers = []
+    for obj in prev_ignores:
+        obj:Object
+        c_obj = deepcopy(obj)
+        c_obj.to_absolute(frame_width,frame_height)
+        
+        x,y,w,h = int(c_obj.x1),int( c_obj.y1), int(c_obj.x2 -c_obj.x1), int(c_obj.y2 - c_obj.y1)
+        tracker = _get_tracker(prev_im,[x,y,w,h])
+        trackers.append((tracker,c_obj.label))
+        
+    # current data
+    im = self.image_datas[self.index].get_image
+    for tracker, lbl in trackers:
+        success, bbox = tracker.update(im)
+    
+        if success:
+            x, y, w, h = [int(v) for v in bbox]
+            x1,y1,x2,y2 = x,y,x+w,y+h
+            
+            if x1 <= 0 or y1 <= 0 or x2 >= frame_width or y2 >= frame_height:
+                logging.warning("Tracking passed, box intersects with borders")
+                continue
+            o = Object.fromStringXYXYI(f"{lbl} {x1} {y1} {x2} {y2}",frame_width,frame_height)
+            o.to_normalized()
+            self.ignores[self.index].append(o)
