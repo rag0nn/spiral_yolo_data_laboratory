@@ -104,7 +104,10 @@ class SpiralDataset:
                     label_counts[lbl] += data.label_counts[lbl]
                 else:
                     label_counts[lbl] = data.label_counts[lbl]
-                parts_labels_counts[part][lbl] += data.label_counts[lbl]
+                if lbl in parts_labels_counts[part].keys():
+                    parts_labels_counts[part][lbl] += data.label_counts[lbl]
+                else:
+                    parts_labels_counts[part][lbl] = data.label_counts[lbl]
                 
         sorted_total_label_counts = {k: label_counts[k] for k in sorted(label_counts)}
         add_log(f'{self.name} analiz')

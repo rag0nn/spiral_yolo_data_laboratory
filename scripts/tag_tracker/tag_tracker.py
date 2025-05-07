@@ -8,20 +8,30 @@ from enum import Enum
 from copy import deepcopy
 import logging
 
+class AreaStatus(Enum):
+    IGNORE = -1
+    FOCUS = -2
+    FOCUS_FINISHED = -3
+
 class ProcessEnum(Enum):
     NEXT =  "d"
     PREVIOUS = "a"
     DETECTION = "s"
     TRACK_OBJECTS = "w"
-    QUIT = "q"
-    SAVE = "o"
-    CLEAN_OBJS = "r"
     ADD_OBJ = "x"
-    CHANGE_LABEL = "v"
-    ADD_IGNOREAREA = "m"
-    TRACK_AREAS= "n"
+    CLEAN_OBJS = "r"
+    CHANGE_LABEL = "c"
+    
+    ADD_IGNOREAREA = "k"
+    ADD_FOCUSAREA = "j"
+    
+    TRACK_AREAS= "m"
+    CLEAN_AREAS = "n"
+    
     AUTO_PRED =  "u"
-    ADD_FOCUSAREA = "b"
+    PRED_ALL = "o"
+    QUIT = "q"
+    SAVE = "p"
     
     @staticmethod
     def info():
@@ -86,22 +96,22 @@ class Track:
         """
         
         # previous data
-        prev_ignores = data_list[prev_index]
+        prev_areas = data_list[prev_index]
         frame_height,frame_width,_ = prev_image.shape
         
         # tracker init
         trackers = []
-        for obj in prev_ignores:
+        for obj in prev_areas:
             obj:Object
             c_obj = deepcopy(obj)
             c_obj.to_absolute(frame_width,frame_height)
             
             x,y,w,h = int(c_obj.x1),int( c_obj.y1), int(c_obj.x2 -c_obj.x1), int(c_obj.y2 - c_obj.y1)
             tracker = self._get_tracker(prev_image,[x,y,w,h])
-            trackers.append((tracker,c_obj.label))
+            trackers.append((tracker,c_obj.label,c_obj.id))
             
         # current data
-        for tracker, lbl in trackers:
+        for tracker, lbl, id_ in trackers:
             success, bbox = tracker.update(current_image)
         
             if success:
@@ -113,6 +123,10 @@ class Track:
                     continue
                 o = Object.fromStringXYXYI(f"{lbl} {x1} {y1} {x2} {y2}",frame_width,frame_height)
                 o.to_normalized()
+                if id_ == AreaStatus.FOCUS_FINISHED.value:
+                    o.id = AreaStatus.FOCUS.value
+                else:
+                    o.id = id_
                 data_list[current_index].append(o)
                   
 class TagTracker:
@@ -130,6 +144,8 @@ class TagTracker:
         self.data_size = len(self.image_datas)
         self.auto_pred_coverage = 10
         self.tracker = Track(self.track_backbone_path,self.track_neckhead_path)
+        self.focus_detection_treshold = 100
+        
         # processers
         self.mon_helper = MonitorHelper()
         self.model = ObjectDetectionPipeline()
@@ -155,7 +171,10 @@ class TagTracker:
             
     def remove_current_objs(self):
         self.objects[self.index].clear()
+
+    def remove_current_areas(self):
         self.ignores[self.index].clear()
+        self.focuses[self.index].clear()
         
     def add_obj(self):
         o = self.get_area()
@@ -163,10 +182,12 @@ class TagTracker:
         
     def add_focus_area(self):
         o = self.get_area(label=4)
+        o.id = AreaStatus.FOCUS.value
         self.focuses[self.index].append(o)
         
     def add_ignore_area(self):
         o = self.get_area(label=4)
+        o.id = AreaStatus.IGNORE.value
         self.ignores[self.index].append(o)
         
     def get_area(self,label=None):
@@ -183,8 +204,6 @@ class TagTracker:
     def change_chosen_label(self):
         self.chosen_label = int(input("Chosen Label: "))
         
-
-    
     def save_outputs(self):
         for i,im_data in tqdm(enumerate(self.image_datas)):
             txt_name = im_data.get_just_name + ".txt"
@@ -218,6 +237,7 @@ class TagTracker:
         # monitoring
         frame = cv2.resize(frame,(self.win_width,self.win_height))
         frame = ProcessEnum.paint_info(frame)
+        frame = cv2.putText(frame,str(self.index),(20,50),cv2.FONT_HERSHEY_DUPLEX,1.0,(255,0,0),1)
         cv2.imshow(self.win_name,(frame))
         cv2.resizeWindow(self.win_name,self.win_width,self.win_height)
         
@@ -255,10 +275,79 @@ class TagTracker:
             self.index_prev,
             self.index)
         
-    def apply_focus(self):
-        #TODO eğer önceki frame'de obje varsa track olarak al ve ekle
-        #TODO eğer yoksa object detection modelle tahmin et ve ekle
-        pass
+    def apply_focus(self):        
+        
+        for area in filter(lambda x: x.id == AreaStatus.FOCUS.value, self.focuses[self.index]):
+            for obj in self.objects[self.index]:
+                area:Object
+                obj:Object
+                if area.intersects(obj):
+                    area.id = AreaStatus.FOCUS_FINISHED.value
+        
+        # try track previous objects    
+        results = []
+        objs_ = deepcopy(self.objects)
+        self.tracker.track_areas(
+            self.image_datas[self.index_prev].get_image,
+            self.image_datas[self.index].get_image,
+            objs_,
+            self.index_prev,
+            self.index)
+        current_objs = objs_[self.index]
+        for obj in current_objs:
+            for area in filter(lambda x: x.id == AreaStatus.FOCUS.value,self.focuses[self.index]):
+                obj:Object
+                area:Object
+                if area.intersects(obj):
+                    area.id = AreaStatus.FOCUS_FINISHED.value
+                    results.append(obj)
+        
+        for obj in results:
+            self.objects[self.index].append(obj)
+            
+        # if not there, guess with object detection model and adD
+        if not results:
+            image = self.image_datas[self.index].get_image
+            orig_height,orig_width,_ = image.shape
+            for area in filter(lambda x: x.id == AreaStatus.FOCUS.value,self.focuses[self.index]):
+                area:Object
+                area_copy = deepcopy(area)
+                area_copy.to_absolute(orig_width,orig_height)
+                if area_copy.area > self.focus_detection_treshold:
+                    logging.info("Applying Object Detection To Focus Area")
+                    roi = image[area_copy.y1:area_copy.y2,area_copy.x1:area_copy.x2]
+                    objs = self.model.predict(roi,img_width=area_copy.width,img_height=area_copy.height)
+                    for obj in objs:
+                        obj.x1 += area_copy.x1
+                        obj.y1 += area_copy.y1
+                        obj.x2 += area_copy.x1
+                        obj.y2 += area_copy.y1
+                        obj.image_height = orig_height
+                        obj.image_width = orig_width
+                        obj.to_normalized()
+                        self.objects[self.index].append(obj)
+                else:
+                    logging.info("Focus Area too small for Object Detection")
+                area.id = AreaStatus.FOCUS_FINISHED.value
+   
+    def check_area_intersect(self):
+        focus_list = self.focuses[self.index]
+        for a in focus_list:
+            for b in focus_list[::-1]:
+                a:Object
+                b:Object
+                if a is not b and a.intersects(b):
+                    focus_list.remove(b)
+        
+        ignore_list = self.ignores[self.index]
+        for a in ignore_list:
+            for b in ignore_list[::-1]:
+                a:Object
+                b:Object
+                if a is not b and a.intersects(b):
+                    ignore_list.remove(b)  
+
+                
     
     def clean_objects_in_ignore_areas(self):
         # cleaning via ignore areas
@@ -267,11 +356,14 @@ class TagTracker:
             for obj in self.objects[self.index][::-1]: 
                 if area.intersects(obj):
                     self.objects[self.index].remove(obj)       
-                    
+              
     def session(self):
         while True:
             self.clean_objects_in_ignore_areas()
-            
+            self.check_area_intersect()
+            if self.focuses[self.index] and list(area.id == AreaStatus.FOCUS.value for area in self.focuses[self.index]).count(True) > 0: 
+                self.apply_focus()
+                
             # step
             key = self.show_frame()
             if key == ProcessEnum.NEXT:
@@ -279,6 +371,9 @@ class TagTracker:
             elif key == ProcessEnum.PREVIOUS:
                 self.index_decrease()
             elif key == ProcessEnum.TRACK_OBJECTS:
+                if self.index == 0:
+                    logging.info("Focus area can't use in first image")
+                    continue
                 self.track_objects()
             elif key == ProcessEnum.DETECTION:
                 self.detect_objects()
@@ -291,11 +386,18 @@ class TagTracker:
             elif key == ProcessEnum.TRACK_AREAS:
                 self.track_areas()
             elif key == ProcessEnum.ADD_FOCUSAREA:
+                if self.index == 0:
+                    logging.info("Focus area can't use in first image")
+                    continue
                 self.add_focus_area()
             elif key == ProcessEnum.ADD_IGNOREAREA:
                 self.add_ignore_area()
+            elif key == ProcessEnum.CLEAN_AREAS:
+                self.remove_current_areas()
             elif key == ProcessEnum.AUTO_PRED:
                 self.auto_prediction()
+            elif key == ProcessEnum.PRED_ALL:
+                self.predict_all()
             elif key == ProcessEnum.QUIT:
                 cv2.destroyWindow(self.win_name)
                 break
@@ -315,21 +417,31 @@ class TagTracker:
                 self.objects[self.index].clear()
             if self.ignores[self.index]:
                 self.ignores[self.index].clear()
-                
+            if self.focuses[self.index]:
+                self.focuses[self.index].clear()
+            
             self.detect_objects()
             if not self.objects[self.index]:
                 self.track_objects()
+                
             self.track_areas()
-            self.track_focus_areas()
             self.clean_objects_in_ignore_areas()
-            
+            self.check_area_intersect()
+            if self.focuses[self.index] and list(area.id == AreaStatus.FOCUS.value for area in self.focuses[self.index]).count(True) > 0: 
+                self.apply_focus()
+                
             self.show_frame(wait=30)
             self.index_increase()
             
         for i in range(self.auto_pred_coverage):
             self.index_decrease()
         
-        
+    def predict_all(self):
+        for i in tqdm(range(len(self.objects))):
+            self.detect_objects()
+            self.show_frame(wait=10)
+            self.index_increase()
+            
         
 if __name__ == "__main__":
     import argparse
