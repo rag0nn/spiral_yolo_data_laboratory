@@ -195,7 +195,7 @@ class Object:
             raise ValueError(f"{e}")
         
         x1 = float(x - w / 2)
-        x2 = float( x + w / 2)
+        x2 = float(x + w / 2)
         y1 = float(y - h / 2)
         y2 = float(y + h / 2)
         

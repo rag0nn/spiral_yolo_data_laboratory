@@ -59,7 +59,7 @@ class ImageData(BaseData):
     def resize(self,newshape):
         newimage = cv2.resize(self.get_image(),newshape)
         cv2.imwrite(self.path,newimage)
-        logging.info(f"Image Resized to {newshape}: {self.path.name}")
+        logging.debug(f"Image Resized to {newshape}: {self.path.name}")
 
     def get_stats(self):
         return {

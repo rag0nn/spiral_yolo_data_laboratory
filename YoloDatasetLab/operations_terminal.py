@@ -1,17 +1,19 @@
 import os
 from pathlib import Path
 import logging
-from omegaconf import OmegaConf, DictConfig
+from omegaconf import OmegaConf
 from enum import Enum
 import time
 from glob import glob
+from typing import Tuple
+import cv2
 
 from tools.project import Project
 from tools.dataset import Dataset
 from tools.enums import MainPaths
 from tools.utils import evalute_model, datetime_id, get_conf
 from tools.image_filters import Filters
-from typing import Tuple
+
 
 MAINPATH = MainPaths.MAINPATH.value
 PROJECTSPATH = MainPaths.PROJECTSPATH.value
@@ -63,8 +65,6 @@ def _timer(message="PROCESS STARTED",level=10):
             return result
         return inner
     return decorator
-
-
 
 class EditOperations(Enum):
     """
@@ -231,7 +231,6 @@ class EditOperations(Enum):
     DatasetApplyFilter = ("Apply Filter", apply_filters)
     DatasetSliceImages = ("Slice Images", slice_images)
     
-
 class ReviewOperations(Enum):
     """
     Operations which not change anything about data
@@ -261,15 +260,19 @@ class ReviewOperations(Enum):
     
     @_timer("Dataset Analysis")
     def dataset_analysis():
-        logging.info("Dataset Analysis")
         d, idx = _select_dataset()
         report = d.get_report()
         logging.info(f"Results {report}")
         
-
+    @_timer("Review Dataset")
+    def dataset_review():
+        dataset, idx = _select_dataset()
+        dataset.review_dataset()
+        
     ProjectSwitchProject = ("Switch Project", switch_project)
     ProjectAnalysis = ("Project Statistics", project_analysis)
     DatasetAnalysis = ("Dataset Analysis", dataset_analysis)
+    DatasetReview = ("Dataset Review", dataset_review)
 
 class ModelOperations(Enum):
     
@@ -291,7 +294,6 @@ class ModelOperations(Enum):
             d,idx = _select_dataset()
             detect_paths.append(Path(d.path,"detect","detect.yaml"))
         
-        
         out_name = f"{datetime_id()}"
         for pth in detect_paths:
             o1 = Path(MODELS_PATH, "output")
@@ -306,7 +308,6 @@ class ModelOperations(Enum):
         
     ModelEvaluation = ("Model Evaluation", model_evaluation)
 
-    
 class Operations(Enum):
     REVIEW = ("Review Operations",ReviewOperations)
     EDIT = ("Editing Operations",EditOperations)

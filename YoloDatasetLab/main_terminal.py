@@ -12,6 +12,7 @@ def main():
 main()
     
 # TODO EKLENECEKLER
+# Review function
 
 # GUI
 # REPORTS Obje içermeyen görsel sayısı (background görselleri) ve reports sistemini güncelle

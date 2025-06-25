@@ -11,7 +11,7 @@ from typing import Union, Callable, Tuple
 from .data import Data
 from .reports import *
 from .enums import Category,DatasetFolders
-from .utils import datetime_id
+from .utils import datetime_id, get_conf
 
 
 class Dataset:
@@ -479,6 +479,63 @@ class Dataset:
                 data.slice(target_shape)
         
         logging.info(f"Image sliced to {target_shape}")
+        
+    def review_dataset(self):
+        from tools.monitor.monitor_helper import MonitorHelper
+        import cv2
+        ds_config = OmegaConf.load(Path(self.path,"detect","detect.yaml"))
+        helper = MonitorHelper()
+        global_cfg = get_conf()
+
+        for cat in Category:
+            winname = f"{Path(self.path).stem}-{cat.value}"
+            data_len = len(self.get_data(cat))
+            if data_len == 0:
+                continue
+            f_idx = 0
+            chunk_size = 50
+            exit_category = False
+
+            while True:
+                # Clamp f_idx to valid range
+                if f_idx < 0:
+                    f_idx = 0
+                if f_idx >= data_len:
+                    f_idx = data_len - chunk_size if data_len - chunk_size >= 0 else 0
+
+                l_idx = min(f_idx + chunk_size, data_len)
+                datas = self.get_data(cat, f_idx, l_idx)
+                idx = 0
+
+                while 0 <= idx < len(datas):
+                    data = datas[idx]
+                    frame = data.image_data.get_image()
+                    frame = helper.paint_objects(frame, data, list(label for label in ds_config.names.values()))
+                    frame = helper.paint_info(frame, data, idx)
+                    frame = cv2.resize(frame, (global_cfg.review_monitor.monitor_width, global_cfg.review_monitor.monitor_height))
+                    cv2.imshow(winname, frame)
+                    key = cv2.waitKey(0)
+                    if key == ord("q"):
+                        cv2.destroyAllWindows()
+                        return
+                    elif key == ord(" "):
+                        cv2.destroyWindow(winname)
+                        exit_category = True
+                        break
+                    elif key == ord("d"):
+                        idx += 1
+                    if idx >= len(datas):
+                        f_idx += chunk_size
+                        break
+                    elif key == ord("a"):
+                        idx -= 1
+                    if idx < 0:
+                        f_idx -= chunk_size
+                        break
+                if exit_category:
+                    break
+                # If we exit the inner while loop normally, move to next chunk
+                f_idx += chunk_size
         
     @staticmethod      
     def build_skeleton(path):
