@@ -6,6 +6,8 @@ logging.basicConfig(
 )          
 
 def main():
+    from tools.enums import MainPaths
+    print(MainPaths.MAINPATH.value)
     Menu()
 main()
     

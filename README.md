@@ -1,40 +1,133 @@
+# English
 
-<div>
-      <h1>SpirAl YOLO Data Laboratory</h1>
-  <div>
-    <h3>What is The SpirAi Data Lab?</h3>
-    <p>Te library provides Dataset collecting, converting, testing and Model testing on videos, frames, images practically. </p>
-  </div>
-  <div>
-      <details open> 
-            <summary>📘 Usage</summary>
-            <p>It can be added as a local library or can be used by cloning this repo and importing it with a py file in its parent directory.</p>   
-            <p>For dataset processes you can use scripts in datasets folder<, for testing you can use test folder. The models folder is for the YOLO models/p>
-       </details>
-      <div>
-      <img src="https://github.com/rag0nn/spiral_yolo_data_laboratory/blob/main/monitor.png" width=auto>
-</div>
-  </div>
-<details open>
-      <summary>🌲 File and Class Hieararchy</summary>
-      <p><b>Dataset folder</b></p>
-      <p>---datasets: This is where the datasets will sit</p>
-      <p>---merge: This is the merged datasets outputs</p>
-      <p>---utils.py: Scripts for the dataset processes</p>
-      <p><b>Models folder</b></p>
-      <p>---It includes yolo models</p>
-      <p>---GUI.py: You can do transactions with GUI. Just run with python</p>
-      <p><b>Test Folder</b></p>
-      <p>---data: It is where test datas. 3 data type for the use. They are 'video','frames' and 'images'. You can choose for your data type</p>
-      <p>---apply.py: Scripts for the test processes. You can start with create_data() function</p>
-      
-</details>
+YoloDatasetLab is an open-source Python package designed to simplify working with YOLO-based datasets. It provides comprehensive tools for collecting, converting, merging, and testing image, video, and frame-based datasets with YOLO models.
 
+## 🚀 Features
 
-<div>
-      <summary>LICENSE</summary>
-      <p> This project is licensed under the MIT License. For more details, please refer to the LICENSE file </p></div>
-</div>
+- Easily convert and merge datasets in different formats
+- Collect and process video, image, and frame-based data
+- Easy testing and evaluation with YOLO models
+- Command-line and PyQt6-based GUI support
+- Open source and community-driven
+
+## 📦 Installation
+
+Clone the project:
+
+```bash
+git clone https://github.com/rag0nn/spiral_yolo_data_laboratory.git
+cd spiral_yolo_data_laboratory
+```
+
+Alternatively, add the `YoloDatasetLab` folder to your project and import modules directly.
+
+## 📘 Usage
+
+- **Manual usage**:  
+  ```python
+  from YoloDatasetLab.tools.dataset import Dataset
+  from YoloDatasetLab.tools.project import Project
+
+  ds = Dataset("/path/to/dataset")
+  ds.resize_images((640, 480))
+  ```
+- **Terminal menu** (Recommended):  
+  ```bash
+  python YoloDatasetLab/main_terminal.py
+  ```
+- **GUI** (Work in progress 🚧):  
+  ```bash
+  python YoloDatasetLab/main_gui.py
+  ```
+
+## 🛠️ Terminal Operations Functions
+
+Below are the main functions in `operations_terminal.py` with brief descriptions:
+
+### EditOperations (Modify Data)
+- `create_project`: Create a new project.
+- `create_dataset`: Add a new dataset to the selected project.
+- `merge_datasets`: Merge datasets in the project.
+- `copy_dataset`: Copy a dataset to a specified directory.
+- `copy_dataset_to_same_folder`: Copy a dataset within the same folder.
+- `import_from_same_folder`: Import a dataset from the same folder.
+- `resize_images`: Resize all images in the dataset.
+- `standart_split`: Split the dataset into train/val/test with standard ratios.
+- `balanced_split`: Split the dataset with class balance.
+- `create_sub_dataset`: Create a subset of the dataset.
+- `rename_datas_consecutively`: Rename files in the dataset consecutively.
+- `remove_data`: Remove data from the dataset (currently inactive).
+- `export_unmatches`: Export unmatched images and labels.
+- `convert_annotations`: Convert annotations using a given mapping.
+- `apply_filters`: Apply filters to images.
+- `slice_images`: Slice images into parts.
+
+### ReviewOperations (Read-Only)
+- `switch_project`: Change the active project.
+- `project_analysis`: Show general project statistics.
+- `dataset_analysis`: Detailed analysis of the selected dataset.
+
+### ModelOperations (Model Related)
+- `model_evaluation`: Evaluate the selected model on dataset(s).
+
+## 📂 File and Folder Structure
+
+```
+YoloDatasetLab/
+  ├── __init__.py
+  ├── config.yaml
+  ├── main_terminal.py (For terminal control)
+  ├── main_gui.py (For GUI control, !!! In Development 🚧)
+  ├── operations_terminal.py 
+  ├── operations_gui.py 
+  ├── tools/
+  │     ├── __init__.py
+  │     ├── project.py (Project)
+  │     ├── dataset.py (Dataset)
+  │     ├── data.py (Holds data, image, and label)
+  │     ├── enums.py (Constant Variables)
+  │     ├── image_filters.py (Image Effect Filters)
+  │     ├── reports.py (Data Reporting Classes)
+  │     ├── object.py (YOLO Object Classes)
+  │     ├── utils.py
+  │     └── gui/
+  │           ├── __init__.py
+  │           ├── win_review.py
+  │           ├── constants.py
+  │           └── ... (other GUI files)
+  ├── models/
+  │     ├── ... (YOLO models and weight files)
+  ├── test/
+  │     ├── data/
+  │     └── apply.py
+  ├── projects/
+  │     ├── ... (created projects)
+  │     └── project_example
+  │           ├── archive.py (Old files related to the project are stored here)
+  │           ├── output.py (Statistics, data merging outputs are here)
+  │           └── datasets (Datasets in the project are stored here)
+  ├── LICENSE
+  └── README.md
+```
+
+## 🤝 Contributing
+
+We welcome your contributions! You can report bugs, add new features, or improve documentation.
+
+1. Fork the repository
+2. Create a new branch (`git checkout -b feature/newfeature`)
+3. Commit your changes (`git commit -am 'Description'`)
+4. Push your branch (`git push origin feature/newfeature`)
+5. Open a pull request
+
+## 📝 License
+
+This project is licensed under the [MIT License](LICENSE). See the LICENSE file for details.
+
+---
+
+Thank you for your suggestions, contributions, and feedback!  
+For more information and updates, visit our [GitHub page](https://github.com/rag0nn/spiral_yolo_data_laboratory).
 
 
 

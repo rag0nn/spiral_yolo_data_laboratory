@@ -1,17 +1,17 @@
-import logging
-from tools.dataset import Dataset
-from tools.enums import Category
-from tools.data import Data
-from tools.reports import DataReports,CategoryReports,DatasetReports
-from pathlib import Path
-from tools.project import Project
-from main import create_project
+# import logging
+# from tools.dataset import Dataset
+# from tools.enums import Category
+# from tools.data import Data
+# from tools.reports import DataReports,CategoryReports,DatasetReports
+# from pathlib import Path
+# from tools.project import Project
+# from main import create_project
 
-from main import main
+# from main import main
 
-logging.basicConfig(
-    level=logging.DEBUG,
-)
+# logging.basicConfig(
+#     level=logging.DEBUG,
+# )
 
 # project
 # p = Project(Path(r"C:\Users\asus\Desktop\NEW_DATASET_LAB\projects\newo"))
