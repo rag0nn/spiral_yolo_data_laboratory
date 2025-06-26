@@ -1,4 +1,4 @@
-# English
+# YoloDatasetLab
 
 YoloDatasetLab is an open-source Python package designed to simplify working with YOLO-based datasets. It provides comprehensive tools for collecting, converting, merging, and testing image, video, and frame-based datasets with YOLO models.
 
