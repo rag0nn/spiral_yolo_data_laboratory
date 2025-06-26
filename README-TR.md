@@ -129,3 +129,8 @@ Her türlü öneri, katkı ve geri bildiriminiz için teşekkürler!
 Daha fazla bilgi ve güncellemeler için [GitHub sayfamızı](https://github.com/rag0nn/spiral_yolo_data_laboratory) ziyaret edebilirsiniz.
 
 ---
+
+## Desteklenen Veri Türleri
+Nöral Networkler için : .pt
+Görseller için : .jpg 
+Etiketler için : .txt 
