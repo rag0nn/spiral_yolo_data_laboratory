@@ -12,5 +12,6 @@
 *.xlsx
 *.zip
 *.cache
+*.pyc
 temp.py
 tmp2.py

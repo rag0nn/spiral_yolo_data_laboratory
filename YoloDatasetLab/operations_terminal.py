@@ -238,7 +238,10 @@ class ReviewOperations(Enum):
     @_timer("Switch Project")
     def switch_project():
         cfg = get_conf()
-        project_names = os.listdir(PROJECTSPATH)
+        project_names = [
+            name for name in os.listdir(PROJECTSPATH)
+            if os.path.isdir(os.path.join(PROJECTSPATH, name)) and not name.startswith('__')
+        ]
         logging.info(f"Switch Chosen Project (current : {cfg.chosen_project})")
 
         for i, name in enumerate(project_names):
