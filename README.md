@@ -129,6 +129,8 @@ This project is licensed under the [MIT License](LICENSE). See the LICENSE file 
 Thank you for your suggestions, contributions, and feedback!  
 For more information and updates, visit our [GitHub page](https://github.com/rag0nn/spiral_yolo_data_laboratory).
 
+---
+
 ## Supported Files
 .pt for nn models
 .jpg for image data
