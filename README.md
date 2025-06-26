@@ -106,6 +106,18 @@ YoloDatasetLab/
   │           ├── archive.py (Old files related to the project are stored here)
   │           ├── output.py (Statistics, data merging outputs are here)
   │           └── datasets (Datasets in the project are stored here)
+  │                   └── dataset_example (Datasets in the project are stored here)
+  │                         └── output
+  │                         └── detect
+  │                               └── images
+  │                                   └── train
+  │                                   └── test
+  │                                   └── val
+  │                               └── labels
+  │                                   └── train
+  │                                   └── test
+  │                                   └── val
+  │                               └── detect.yaml
   ├── LICENSE
   └── README.md
 ```

@@ -105,6 +105,18 @@ YoloDatasetLab/
   │           ├── archive.py (Projeye ait eski dosyalar burada saklanır)
   │           ├── output.py (İstatistikler, veri stlerini birleştirme gibi çıktılar burada)
   │           └── datasets (Projedeki veri setleri burada saklanır)
+  │                   └── dataset_example (Datasets in the project are stored here)
+  │                         └── output
+  │                         └── detect
+  │                               └── images
+  │                                   └── train
+  │                                   └── test
+  │                                   └── val
+  │                               └── labels
+  │                                   └── train
+  │                                   └── test
+  │                                   └── val
+  │                               └── detect.yaml
   ├── LICENSE
   └── README.md
 ```
