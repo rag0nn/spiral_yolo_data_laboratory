@@ -209,6 +209,9 @@ class ReviewOperations(Enum):
         result_text = f"Results {report}"
         logging.info(result_text)
         return result_text
+    @_executer_async("Dataset Review")
+    def dataset_review():
+        selected_dataset.review_dataset()
         
     ProjectAnalysis = ("Project Statistics", project_analysis)
     DatasetAnalysis = ("Dataset Analysis", dataset_analysis)

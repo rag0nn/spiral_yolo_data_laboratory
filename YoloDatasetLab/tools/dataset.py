@@ -483,36 +483,55 @@ class Dataset:
     def review_dataset(self):
         from tools.monitor.monitor_helper import MonitorHelper
         import cv2
+        import math
+        
         ds_config = OmegaConf.load(Path(self.path,"detect","detect.yaml"))
         helper = MonitorHelper()
         global_cfg = get_conf()
+        _controls_dict = {
+            "q" : "exit",
+            "space" : "jump category",
+            "a" : "back",
+            "d" : "forward"
+        }
 
         for cat in Category:
-            winname = f"{Path(self.path).stem}-{cat.value}"
-            data_len = len(self.get_data(cat))
-            if data_len == 0:
-                continue
-            f_idx = 0
+            part_index = 0
+            data_index = 0
+            data_len = len(self.matches[cat]) 
             chunk_size = 50
+            part_count = math.ceil(data_len / chunk_size)
+            extra = data_len % chunk_size
+            fl_indexes = []
             exit_category = False
-
+            winname = f"{Path(self.path).stem}-{cat.value}"
+            
+            # first and last indexes of parts
+            counter = 0
             while True:
-                # Clamp f_idx to valid range
-                if f_idx < 0:
-                    f_idx = 0
-                if f_idx >= data_len:
-                    f_idx = data_len - chunk_size if data_len - chunk_size >= 0 else 0
-
-                l_idx = min(f_idx + chunk_size, data_len)
-                datas = self.get_data(cat, f_idx, l_idx)
-                idx = 0
-
-                while 0 <= idx < len(datas):
-                    data = datas[idx]
+                f = counter * chunk_size
+                l = (counter + 1) * chunk_size
+                if not l > data_len:
+                    fl_indexes.append((f,l))
+                else:
+                    if extra != 0:
+                        fl_indexes.append((f,f + extra))
+                    break
+                counter += 1
+            
+            # data surf
+            while True:
+                f,l = fl_indexes[part_index]
+                datas = self.get_data(cat,f,l)
+                while True:
+                    data = datas[data_index]
+                    
+                    #surf
                     frame = data.image_data.get_image()
                     frame = helper.paint_objects(frame, data, list(label for label in ds_config.names.values()))
-                    frame = helper.paint_info(frame, data, idx)
                     frame = cv2.resize(frame, (global_cfg.review_monitor.monitor_width, global_cfg.review_monitor.monitor_height))
+                    frame = helper.paint_info(frame, data, data_index, f,l, part_index, part_count, _controls_dict)
+                    
                     cv2.imshow(winname, frame)
                     key = cv2.waitKey(0)
                     if key == ord("q"):
@@ -523,20 +542,31 @@ class Dataset:
                         exit_category = True
                         break
                     elif key == ord("d"):
-                        idx += 1
-                    if idx >= len(datas):
-                        f_idx += chunk_size
-                        break
+                        data_index += 1
                     elif key == ord("a"):
-                        idx -= 1
-                    if idx < 0:
-                        f_idx -= chunk_size
-                        break
+                        data_index -= 1
+                    # surf
+                    
+                    # back
+                    if data_index == -1:
+                        if part_index != 0:
+                            part_index -= 1
+                            data_index = fl_indexes[part_index][1] - fl_indexes[part_index][0] -1
+                            break
+                        else:
+                            data_index = 0
+                    # forward
+                    if data_index == fl_indexes[part_index][1] - fl_indexes[part_index][0]:
+                        if part_index != part_count-1:
+                            part_index += 1
+                            data_index = 0
+                            break
+                        else:
+                            data_index = fl_indexes[part_index][1] - fl_indexes[part_index][0]-1
+                            
                 if exit_category:
                     break
-                # If we exit the inner while loop normally, move to next chunk
-                f_idx += chunk_size
-        
+
     @staticmethod      
     def build_skeleton(path):
         """

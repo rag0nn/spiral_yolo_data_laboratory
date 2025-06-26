@@ -88,12 +88,17 @@ class MonitorHelper:
             logging.debug("Objects Painted")
         return image
         
-    def paint_info(self,image, data:Data, index):
+    def paint_info(self,image, data:Data, current_idx, first_index ,last_index, part_index, part_count, controls_dict:dict):
         menu_x, menu_y = self.config.review_monitor.info.menu_x, self.config.review_monitor.info.menu_y
         shift_x, shift_y = self.config.review_monitor.info.shift_x,self.config.review_monitor.info.shift_y
         cfg = self.config.review_monitor.object_monitoring
         shape = data.image_data.shape
-        cv2.putText(image, f"{index}",(menu_x, menu_y),cv2.FONT_HERSHEY_DUPLEX,cfg.text_scale,self.config.review_monitor.info.text_color)
+        for key, value in controls_dict.items():
+            cv2.putText(image, f"{key} : {value}",(menu_x, menu_y),cv2.FONT_HERSHEY_DUPLEX,cfg.text_scale,self.config.review_monitor.info.text_color)
+            menu_y += shift_y
+            menu_x += shift_x     
+            
+        cv2.putText(image, f"{part_index+1}/{part_count} [{first_index}:{last_index}) {current_idx}/{last_index-first_index-1}",(menu_x, menu_y),cv2.FONT_HERSHEY_DUPLEX,cfg.text_scale,self.config.review_monitor.info.text_color)
         menu_y += shift_y
         menu_x += shift_x
         cv2.putText(image, f"{data.name}",(menu_x, menu_y),cv2.FONT_HERSHEY_DUPLEX,cfg.text_scale,self.config.review_monitor.info.text_color)

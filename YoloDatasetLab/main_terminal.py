@@ -12,7 +12,7 @@ def main():
 main()
     
 # TODO EKLENECEKLER
-# Review function
+# datataset Review function indexis will be fix
 
 # GUI
 # REPORTS Obje içermeyen görsel sayısı (background görselleri) ve reports sistemini güncelle
