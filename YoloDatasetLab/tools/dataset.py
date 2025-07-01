@@ -506,6 +506,9 @@ class Dataset:
             exit_category = False
             winname = f"{Path(self.path).stem}-{cat.value}"
             
+            if data_len == 0:
+                logging.info(f"{cat} hasn' got data")
+                continue
             # first and last indexes of parts
             counter = 0
             while True:

@@ -25,6 +25,12 @@ def _save_conf(newconf):
     with open(CONFIG_PATH, "w", encoding="utf-8") as f:
         OmegaConf.save(config=newconf, f=f.name)
    
+def _list_datasets():
+    cfg = get_conf()
+    p = _get_current_project(cfg)
+    for i, name in enumerate(p.dataset_list):
+        logging.info(f"{i}:{name}")
+        
 def _select_dataset() -> Tuple[Dataset, int]:
     cfg = get_conf()
     p = _get_current_project(cfg)
@@ -172,11 +178,6 @@ class EditOperations(Enum):
             keep_current_decision = False
         dataset.rename_datas_consecutive(prefix,keep_current_decision)
 
-    @_timer("Remove Data")
-    def remove_data():
-        ## TODO 
-        logging.error(f"This function temporily absent")
-
     @_timer("Export Unmatches")
     def export_unmatches():
         dataset,idx = _select_dataset()
@@ -225,7 +226,6 @@ class EditOperations(Enum):
     DatasetBalancedSplit = ("Balanced Split", balanced_split)
     DatasetCreateSubDataset = ("Create Sub Dataset", create_sub_dataset)
     DatasetRenameDatasConsecutively = ("Rename Datas Consecutively", rename_datas_consecutively)
-    DatasetRemoveData = ("Remove Data", remove_data)
     DatasetExportUnmatches = ("Export Unmatches", export_unmatches)
     DatasetConvertAnnotations = ("Convert Annotations", convert_annotations)
     DatasetApplyFilter = ("Apply Filter", apply_filters)
@@ -261,6 +261,10 @@ class ReviewOperations(Enum):
         output_dict = p.analysis()
         logging.info(f"Results--\n{output_dict}")
     
+    @_timer("List Datasets")
+    def project_list_datasets():
+        _list_datasets()
+    
     @_timer("Dataset Analysis")
     def dataset_analysis():
         d, idx = _select_dataset()
@@ -274,6 +278,7 @@ class ReviewOperations(Enum):
         
     ProjectSwitchProject = ("Switch Project", switch_project)
     ProjectAnalysis = ("Project Statistics", project_analysis)
+    ProjectListDatasets = ("List Datasets", project_list_datasets)
     DatasetAnalysis = ("Dataset Analysis", dataset_analysis)
     DatasetReview = ("Dataset Review", dataset_review)
 

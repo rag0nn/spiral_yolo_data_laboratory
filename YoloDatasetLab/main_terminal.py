@@ -12,8 +12,5 @@ def main():
 main()
     
 # TODO EKLENECEKLER
-# datataset Review function indexis will be fix
-
 # GUI
 # REPORTS Obje içermeyen görsel sayısı (background görselleri) ve reports sistemini güncelle
-## TODO: Object.fromXYWHF fonksiyonundaki daraltmalaraı kontrol edilecek görseller üzerinde görselleştirmeler ile

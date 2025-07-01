@@ -6,6 +6,8 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMessageBox
 
+from ..dataset import Dataset
+
 class ReviewWinWidget(QWidget):
     def __init__(self, 
                  main_attributes, 
@@ -32,7 +34,7 @@ class ReviewWinWidget(QWidget):
 
         # RIGHT PANEL
         right_panel = QVBoxLayout()
-        right_panel.addWidget(QLabel("Datasets"))
+        right_panel.addWidget(QLabel("Review Datasets"))
         dataset_list_widget = QWidget()
         dataset_list_layout = QVBoxLayout(dataset_list_widget)
         dataset_list_layout.setAlignment(Qt.AlignmentFlag.AlignTop)
@@ -42,7 +44,7 @@ class ReviewWinWidget(QWidget):
             row = QHBoxLayout()
             # Dataset ismi butonu
             ds_btn = QPushButton(str(ds.stem))
-            ds_btn.clicked.connect(lambda _, name=ds: self.select_dataset(name))
+            ds_btn.clicked.connect(lambda _, name=ds: self.review_dataset(name))
             row.addWidget(ds_btn)
             container = QWidget()
             container.setLayout(row)
@@ -60,13 +62,7 @@ class ReviewWinWidget(QWidget):
         main_layout.addLayout(right_panel, 2)
         self.setLayout(main_layout)
 
-    def select_dataset(self, dataset_name):
-        # Seçili dataset'i değiştir (dummy)
-        print(f"Seçili dataset değiştirildi: {dataset_name}")
+    def review_dataset(self, dataset_path):
+        ds = Dataset(dataset_path)
+        ds.review_dataset()
 
-    def review_dataset(self, dataset_name):
-        # Dummy review fonksiyonu
-        print(f"Review dataset: {dataset_name}")
-
-    def dummy_operation(self, op_name):
-        print(f"Operasyon çalıştı: {op_name}")
