@@ -62,7 +62,6 @@ class Project:
         return dataset
 
     def merge(self):
-        
         logging.info("Merging Process Started")
         output_ds_name = f"{self.name}_{datetime_id()}"
         output_ds_path = Path(self.path,ProjectFiles.OUTPUT_MERGED.value)
@@ -81,6 +80,16 @@ class Project:
             if errs:
                 has_error.append(Path(ds.path).stem)
         logging.info(f"List of faults: {has_error}")
+        
+    def fix_object_errors(self):
+        fixed = []
+        for ds_name in tqdm(self.dataset_list):
+            ds = Dataset(Path(self.path,ProjectFiles.DATASETS.value,ds_name))
+            fix_status = ds.fix_object_errors()
+            if fix_status:
+                fixed.append(Path(ds.path).stem)
+        logging.info(f"List of fixed datasets: {fixed}")
+            
         
     @staticmethod
     def create(path,name,labels:list):

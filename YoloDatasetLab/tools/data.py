@@ -151,7 +151,7 @@ class AnnotationData(BaseData):
                 objects.append(obj) 
             except:
                 logging.error(f"Object Error Occured: {self.path} line: {i} -> {line}")
-                errors.append(f"{self.path},{i},[{line}]")
+                errors.append(f"{self.path},{i},[{line[:-2]}]")
         
         return objects, errors
 

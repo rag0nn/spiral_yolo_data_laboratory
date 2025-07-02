@@ -77,7 +77,8 @@ class Dataset:
         for cat in Category:
             datas = self.get_data(cat)
             for data in datas:
-                errors += data.annotation_data.errors
+                for err in data.annotation_data.errors:
+                    errors.append(str(err) + "\n") 
                 
         if errors:
             path = Path(self.path,"output","object_errors.txt")
@@ -87,6 +88,31 @@ class Dataset:
             logging.info(f"Object Errors Writed tos {path}")
         
         return errors
+    
+    def fix_object_errors(self):
+        errors_path = Path(self.path,"output","object_errors.txt")
+        if os.path.exists(errors_path):
+            f = open(errors_path,"r")
+            lines = f.readlines()
+            lines.reverse()
+            f.close()
+            for line in tqdm(lines):
+                pth, idx, labels_line = line.split(",")
+                print(pth)
+                with open(pth, "r") as f:
+                    lines = f.readlines()
+
+                del lines[int(idx)]
+                
+                with open(pth, "w") as f:
+                    f.writelines(lines)
+                    
+                logging.debug(f"Writed {pth}")
+            return True
+        else:
+            logging.info(f"Dataset hasn't got any object errors")
+            return False
+            
 
     def get_data(self,category:Category,f_index:Union[None,int]=None,l_index:Union[None,int]=None,random=False)->list[Data]:
         assert isinstance(category,Category) , "Category must be element of category enum"

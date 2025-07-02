@@ -104,7 +104,13 @@ class EditOperations(Enum):
         conf = get_conf()
         p = _get_current_project(conf)
         p.merge()
-        
+
+    @_timer("Fix Project Object Errors")
+    def fix_project_object_errors():
+        conf = get_conf()
+        chosen_project = _get_current_project(conf)
+        chosen_project.fix_object_errors()
+         
     @_timer("Copy Dataset")
     def copy_dataset():
         logging.info("Copy Dataset")
@@ -214,10 +220,18 @@ class EditOperations(Enum):
         w = int(input("Slice width: "))
         h = int(input("Slice height: "))
         dataset.slice_images(target_shape=(w,h))
+    
+    @_timer("Fix Dataset Object Errors")
+    def fix_dataset_object_errors():
+        dataset, idx = _select_dataset()
+        dataset.fix_object_errors()
+        
+
         
     ProjectCreateProject = ("Create Project", create_project)
     ProjectCreateDataset = ("Create Dataset", create_dataset)
     ProjectMergeDatasets = ("Merge Datasets", merge_datasets)
+    ProjectFixObjectErrors = ("Project Fix Object Errors", fix_project_object_errors)
     DatasetCopyDataset = ("Copy Dataset", copy_dataset)
     DatasetCopyDatasetToSameFolder = ("Copy Dataset To Same Folder", copy_dataset_to_same_folder)
     DatasetImportFromSameFolder = ("Import From Same Folder to Dataset", import_from_same_folder)
@@ -230,6 +244,7 @@ class EditOperations(Enum):
     DatasetConvertAnnotations = ("Convert Annotations", convert_annotations)
     DatasetApplyFilter = ("Apply Filter", apply_filters)
     DatasetSliceImages = ("Slice Images", slice_images)
+    DatasetFixObjectErrors = ("Dataset Fix Object Errors", fix_dataset_object_errors)
     
 class ReviewOperations(Enum):
     """
