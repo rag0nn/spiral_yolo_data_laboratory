@@ -199,11 +199,14 @@ class Object:
         y1 = float(y - h / 2)
         y2 = float(y + h / 2)
         
-        
-        x1 = float(max(0, min(1, x1)))
-        y1 = float(max(0, min(1, y1)))
-        x2 = float(max(0, min(1, x2)))
-        y2 = float(max(0, min(1, y2)))
+        try:
+            x1 = float(max(0, min(1, x1)))
+            y1 = float(max(0, min(1, y1)))
+            x2 = float(max(0, min(1, x2)))
+            y2 = float(max(0, min(1, y2)))
+        except:
+            raise ValueError(f"{e}\n Last values (x1,y1,x2,y2): {x1,y1,x2,y2} original x y w h: {x,y,w,h}")
+            
        
         return cls(x1,y1,x2,y2,lbl,True)
 

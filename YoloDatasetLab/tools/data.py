@@ -133,7 +133,7 @@ class ImageData(BaseData):
 class AnnotationData(BaseData):
     def __init__(self, path: Path):
         super().__init__(path, FileType.ANNOTATION)
-        self.objects = self._load_objects()
+        self.objects, self.errors = self._load_objects()
 
     def __str__(self):
         return f"{super().__str__()} object_count: {len(self.objects)}"
@@ -144,11 +144,16 @@ class AnnotationData(BaseData):
         f.close()
         
         objects= []
-        for line in lines:
-            obj = Object.fromStringXYWHF(line)
-            objects.append(obj) 
+        errors = []
+        for i,line in enumerate(lines):
+            try:
+                obj = Object.fromStringXYWHF(line)
+                objects.append(obj) 
+            except:
+                logging.error(f"Object Error Occured: {self.path} line: {i} -> {line}")
+                errors.append(f"{self.path},{i},[{line}]")
         
-        return objects
+        return objects, errors
 
     def get_stats(self):
         results = {}
@@ -214,10 +219,6 @@ class AnnotationData(BaseData):
             y = 0    
         return x,y        
 
-            
-    
-    
-    
 class Data:
     def __init__(self,ds_path:Path,cat:Category,data_stem:str):        
         image_path = Path(ds_path,"detect",DatasetFolders.IMAGES.value[0],cat.value,data_stem).with_suffix('.jpg')

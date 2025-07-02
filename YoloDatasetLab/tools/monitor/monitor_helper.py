@@ -50,7 +50,7 @@ class MonitorHelper:
             return "UNKWN"
         
         
-    def paint_objects(self,image:np.array , data:Data, label_texts:list):
+    def paint_objects(self,image:np.array , data:Data, label_texts:list, paint_color=True):
         """
         Paints given objects
         inputs:
@@ -79,7 +79,8 @@ class MonitorHelper:
                     text_box_x2,text_box_y2 = obj.x2 + cfg.textbox_x2_if_normal, obj.y1 + cfg.textbox_y2
                 
                 # object
-                image = self._paint_weighted_color(image,obj.x1,obj.y1,obj.x2,obj.y2,label_color,cfg.objbackbox_opacity)
+                if paint_color:
+                    image = self._paint_weighted_color(image,obj.x1,obj.y1,obj.x2,obj.y2,label_color,cfg.objbackbox_opacity)
                 cv2.rectangle(image,(obj.x1,obj.y1),(obj.x2,obj.y2),(255,255,255),cfg.objbox_thickness)
                 
                 # text box

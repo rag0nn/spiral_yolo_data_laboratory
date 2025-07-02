@@ -72,6 +72,15 @@ class Project:
         for ds_name in tqdm(self.dataset_list):
             ds = Dataset(Path(self.path,ProjectFiles.DATASETS.value,ds_name))
             ds.copy(str(Path(output_ds_path,output_ds_name)))
+            
+    def check_object_errors(self):
+        has_error = []
+        for ds_name in tqdm(self.dataset_list):
+            ds = Dataset(Path(self.path,ProjectFiles.DATASETS.value,ds_name))
+            errs = ds.check_object_errors()
+            if errs:
+                has_error.append(Path(ds.path).stem)
+        logging.info(f"List of faults: {has_error}")
         
     @staticmethod
     def create(path,name,labels:list):

@@ -71,6 +71,22 @@ class Dataset:
             logging.info(f" {cat.value} conjugations: {len(matches_)} unmatched_images: {len(unmatched_ims)} unmatched_annotations: {len(unmatched_annos)}")
                     
         return matches,unmatched_images,unmatched_annotations
+    
+    def check_object_errors(self):
+        errors = []
+        for cat in Category:
+            datas = self.get_data(cat)
+            for data in datas:
+                errors += data.annotation_data.errors
+                
+        if errors:
+            path = Path(self.path,"output","object_errors.txt")
+            f = open(path,"w")
+            f.writelines(errors)
+            f.close()
+            logging.info(f"Object Errors Writed tos {path}")
+        
+        return errors
 
     def get_data(self,category:Category,f_index:Union[None,int]=None,l_index:Union[None,int]=None,random=False)->list[Data]:
         assert isinstance(category,Category) , "Category must be element of category enum"
@@ -492,9 +508,11 @@ class Dataset:
             "q" : "exit",
             "space" : "jump category",
             "a" : "back",
-            "d" : "forward"
+            "d" : "forward",
+            "k" : "paint object color"
         }
 
+        paint_object_color = True
         for cat in Category:
             part_index = 0
             data_index = 0
@@ -505,6 +523,7 @@ class Dataset:
             fl_indexes = []
             exit_category = False
             winname = f"{Path(self.path).stem}-{cat.value}"
+            
             
             if data_len == 0:
                 logging.info(f"{cat} hasn' got data")
@@ -531,7 +550,7 @@ class Dataset:
                     
                     #surf
                     frame = data.image_data.get_image()
-                    frame = helper.paint_objects(frame, data, list(label for label in ds_config.names.values()))
+                    frame = helper.paint_objects(frame, data, list(label for label in ds_config.names.values()),paint_color=paint_object_color)
                     frame = cv2.resize(frame, (global_cfg.review_monitor.monitor_width, global_cfg.review_monitor.monitor_height))
                     frame = helper.paint_info(frame, data, data_index, f,l, part_index, part_count, _controls_dict)
                     
@@ -548,6 +567,8 @@ class Dataset:
                         data_index += 1
                     elif key == ord("a"):
                         data_index -= 1
+                    elif key == ord("k"):
+                        paint_object_color = not paint_object_color
                     # surf
                     
                     # back with data_index

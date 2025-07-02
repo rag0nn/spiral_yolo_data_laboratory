@@ -265,6 +265,12 @@ class ReviewOperations(Enum):
     def project_list_datasets():
         _list_datasets()
     
+    @_timer("Check Project Object Errors")
+    def project_check_object_errors():
+        cfg = get_conf()
+        p = _get_current_project(cfg)
+        p.check_object_errors()
+        
     @_timer("Dataset Analysis")
     def dataset_analysis():
         d, idx = _select_dataset()
@@ -275,12 +281,19 @@ class ReviewOperations(Enum):
     def dataset_review():
         dataset, idx = _select_dataset()
         dataset.review_dataset()
-        
+    
+    @_timer("Check Dataset Object Errors")
+    def dataset_check_object_errors():
+        dataset, idx = _select_dataset()
+        dataset.check_object_errors()
+
     ProjectSwitchProject = ("Switch Project", switch_project)
     ProjectAnalysis = ("Project Statistics", project_analysis)
     ProjectListDatasets = ("List Datasets", project_list_datasets)
+    ProjectCheckObjectErrors = ("Check Project Object Errors", project_check_object_errors)
     DatasetAnalysis = ("Dataset Analysis", dataset_analysis)
     DatasetReview = ("Dataset Review", dataset_review)
+    DatasetCheckObjectErrors = ("Check Dataset Object Errors", dataset_check_object_errors)
 
 class ModelOperations(Enum):
     
