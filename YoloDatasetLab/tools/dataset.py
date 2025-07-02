@@ -499,7 +499,7 @@ class Dataset:
             part_index = 0
             data_index = 0
             data_len = len(self.matches[cat]) 
-            chunk_size = 50
+            chunk_size = 100
             part_count = math.ceil(data_len / chunk_size)
             extra = data_len % chunk_size
             fl_indexes = []
@@ -525,7 +525,7 @@ class Dataset:
             # data surf
             while True:
                 f,l = fl_indexes[part_index]
-                datas = self.get_data(cat,f,l)
+                datas = self.get_data(cat,f,l)    
                 while True:
                     data = datas[data_index]
                     
@@ -550,7 +550,7 @@ class Dataset:
                         data_index -= 1
                     # surf
                     
-                    # back
+                    # back with data_index
                     if data_index == -1:
                         if part_index != 0:
                             part_index -= 1
@@ -558,7 +558,7 @@ class Dataset:
                             break
                         else:
                             data_index = 0
-                    # forward
+                    # forward with data_index
                     if data_index == fl_indexes[part_index][1] - fl_indexes[part_index][0]:
                         if part_index != part_count-1:
                             part_index += 1
@@ -566,7 +566,7 @@ class Dataset:
                             break
                         else:
                             data_index = fl_indexes[part_index][1] - fl_indexes[part_index][0]-1
-                            
+                        
                 if exit_category:
                     break
 

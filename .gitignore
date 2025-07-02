@@ -13,5 +13,6 @@
 *.zip
 *.cache
 *.pyc
+*.log
 temp.py
 tmp2.py
