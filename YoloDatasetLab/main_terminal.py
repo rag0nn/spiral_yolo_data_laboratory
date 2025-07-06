@@ -19,5 +19,6 @@ def main():
     Menu()
 main()
 # TODO EKLENECEKLER
+# Objects duplicated label check
 # GUI
 # REPORTS Obje içermeyen görsel sayısı (background görselleri) ve reports sistemini güncelle

@@ -139,20 +139,27 @@ class AnnotationData(BaseData):
         return f"{super().__str__()} object_count: {len(self.objects)}"
 
     def _load_objects(self):
-        f = open(self.path,"r")
+        f = open(self.path, "r")
         lines = f.readlines()
         f.close()
-        
-        objects= []
+
+        objects = []
         errors = []
-        for i,line in enumerate(lines):
+        unique_set = set()
+        for i, line in enumerate(lines):
             try:
                 obj = Object.fromStringXYWHF(line)
-                objects.append(obj) 
-            except:
+                # Uniqueness key: (label, x1, y1, x2, y2)
+                key = (obj.label, obj.x1, obj.y1, obj.x2, obj.y2)
+                if key not in unique_set:
+                    unique_set.add(key)
+                    objects.append(obj)
+                else:
+                    logging.warning(f"Duplicate object detected: {self.path} line: {i} -> {line.strip()}")
+            except Exception:
                 logging.error(f"Object Error Occured: {self.path} line: {i} -> {line}")
                 errors.append(f"{self.path},{i},[{line[:-2]}]")
-        
+
         return objects, errors
 
     def get_stats(self):

@@ -65,7 +65,8 @@ def evalute_model(model,detect_yaml_path,results_save_path,):
         save_json=True,           # Sonuçları JSON olarak kaydetmek için
         project=results_save_path,        # Kayıtların ana klasörü (istediğiniz path ile değiştirin)
         exist_ok=True,            # Klasör varsa üzerine yazmak için
-        save_txt=True             # Sonuçları txt olarak da kaydetmek için (isteğe bağlı)
+        save_txt=True,             # Sonuçları txt olarak da kaydetmek için (isteğe bağlı)
+        split="test"
     )
     logging.info(f"Average precision for all classes: {results.box.all_ap}")
     logging.info(f"Average precision: {results.box.ap}")

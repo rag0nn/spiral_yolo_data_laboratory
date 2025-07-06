@@ -105,6 +105,19 @@ class EditOperations(Enum):
         p = _get_current_project(conf)
         p.merge()
 
+    @_timer("Project Balanced Split")
+    def project_balanced_split():
+        conf = get_conf()
+        chosen_project = _get_current_project(conf)
+        train= float(input("Train Ratio: "))
+        val= float(input("Validation Ratio: "))
+        test = float(1-train-val)
+        for dataset in chosen_project.dataset_list:
+            dataset:Dataset
+            ds = Dataset(Path(chosen_project.path,"datasets",dataset))
+            ds.split_balanced(train,val,test)
+            logging.info(f"Applied Balanced Train Test Split: Train:{train} Test:{test} Val:{val}")
+        
     @_timer("Fix Project Object Errors")
     def fix_project_object_errors():
         conf = get_conf()
@@ -231,6 +244,7 @@ class EditOperations(Enum):
     ProjectCreateProject = ("Create Project", create_project)
     ProjectCreateDataset = ("Create Dataset", create_dataset)
     ProjectMergeDatasets = ("Merge Datasets", merge_datasets)
+    ProjectBalancedSplit = ("Project Balanced Split", project_balanced_split)
     ProjectFixObjectErrors = ("Project Fix Object Errors", fix_project_object_errors)
     DatasetCopyDataset = ("Copy Dataset", copy_dataset)
     DatasetCopyDatasetToSameFolder = ("Copy Dataset To Same Folder", copy_dataset_to_same_folder)

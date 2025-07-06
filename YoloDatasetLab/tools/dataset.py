@@ -146,6 +146,7 @@ class Dataset:
         return output
         
     def copy(self,dst_path):
+        dateid = datetime_id(with_line=False)
         self.build_skeleton(dst_path)
         detect_path = Path(dst_path,"detect")
         detect_path.mkdir(exist_ok=True)
@@ -158,10 +159,10 @@ class Dataset:
             
             logging.info(f"{Path(self.path).stem} {cat.value} copy process")
             for pth in tqdm(anno_paths,desc="Annotiations duplicating..."):
-                new_anno_name = self.path.stem + "_" + datetime_id(with_line=False) + "_" + Path(pth).name
+                new_anno_name = self.path.stem + "_" + dateid + "_" + Path(pth).name
                 shutil.copy(pth, Path(dst_annos_path, new_anno_name))
             for pth in tqdm(im_paths,desc=" images duplicating..."):
-                new_im_name =  self.path.stem + "_" + datetime_id(with_line=False)+  "_" + Path(pth).name
+                new_im_name =  self.path.stem + "_" + dateid +  "_" + Path(pth).name
                 shutil.copy(pth, Path(dst_imgs_path, new_im_name))
         shutil.copy(Path(self.path,"detect","detect.yaml"),str(Path(detect_path,"detect.yaml")))
         logging.info("Duplications Completed")
@@ -441,7 +442,7 @@ class Dataset:
                 np.random.shuffle(datas)
             count = int(len(datas) * ratio)
             
-            for data in datas[:count]:
+            for data in tqdm(datas[:count]):
                 new_images_path = str(Path(new_ds_path,"detect",DatasetFolders.IMAGES.value[0],cat.value))
                 new_annos_path = str(Path(new_ds_path,"detect",DatasetFolders.LABELS.value[0],cat.value))
                 data.copy(new_images_path,new_annos_path)

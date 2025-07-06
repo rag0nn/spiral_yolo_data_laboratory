@@ -57,6 +57,11 @@ class Filters (Enum):
             Returns:
                 Grayscale uint8 numpy array (yüksek değer = yoğun bulut).
             """
+            # Rastgele parametreler
+            scale = np.random.uniform(100.0, 400.0)
+            octaves = np.random.randint(3, 8)
+            persistence = np.random.uniform(0.3, 0.7)
+            lacunarity = np.random.uniform(1.5, 2.5)
             mask = np.zeros((height, width), dtype=np.float32)
             for y in range(height):
                 for x in range(width):
