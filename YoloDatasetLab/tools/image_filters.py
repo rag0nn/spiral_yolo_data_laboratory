@@ -2,6 +2,7 @@ import numpy as np
 from enum import Enum
 import cv2
 from noise import pnoise2
+import random
 
 from .utils import get_conf
 
@@ -113,7 +114,33 @@ class Filters (Enum):
 
         return result
     
-    
+    def apply_blur(image:np.array) -> np.array:
+        """
+        Randomaized blur fitter. It will apply to %50 chance gauissan or avarage blur
+        """
+        # Görselin boyutlarını al
+        h, w = image.shape[:2]
+        
+        # Maksimum kernel boyutunu sınırlı tut (görüntü çok küçükse düşük seç)
+        max_kernel = min(11, h//10, w//10)
+        if max_kernel < 3:
+            return image  # çok küçükse blur uygulama
+
+        # Yalnızca tek sayılarla çalıştığı için tek sayılı kernel seç
+        possible_kernels = [k for k in range(3, max_kernel+1, 2)]
+        ksize = random.choice(possible_kernels)
+
+        # Rastgele Gaussian ya da Average blur uygula
+        if random.random() < 0.5:
+            # Gaussian Blur
+            blurred = cv2.GaussianBlur(image, (ksize, ksize), 0)
+        else:
+            # Average Blur
+            blurred = cv2.blur(image, (ksize, ksize))
+        
+        return blurred
+
     
     Noise = ("Noise Filter" ,apply_noise)
     Cloud = ("Cloud Filter" ,apply_cloud)
+    Blue =  ("Blur Filter", apply_blur)
