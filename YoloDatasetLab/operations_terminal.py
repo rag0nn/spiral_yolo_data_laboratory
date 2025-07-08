@@ -355,8 +355,34 @@ class ModelOperations(Enum):
             o4.mkdir(exist_ok=True)
             print(o1,o2,o3,o4)
             results = evalute_model(model,pth,o4)
-        
+            
+    @_timer("Dataset With Model Prediction")
+    def dataset_with_model_prediction():
+        conf = get_conf()
+        p = Project(conf.chosen_project)
+        model, idx = _select_model()
+        images_path = str(input("Images Path: "))
+        new_ds = p.create_dataset(f"{Path(images_path).stem}_PREDICTED",["tasit","insan","UAP","UAI"])
+        for pth in glob(images_path + "/*.jpg"):
+            frame = cv2.imread(pth)
+            labels = []
+            results = model.predict(frame)[0]
+            label_list = results.boxes.cls.cpu().numpy()
+            bbox_list = results.boxes.xywhn.cpu().numpy()
+            for lbl, (x,y,w,h) in zip(label_list,bbox_list):
+                label_string = f"{int(lbl)} {x} {y} {w} {h}\n"
+                labels.append(label_string)
+            
+            pth = Path(pth)
+            im_path = Path(new_ds.path,"detect","images","train",pth.name)
+            txt_path = Path(new_ds.path,"detect","labels","train",pth.stem + ".txt")
+            cv2.imwrite(im_path,frame)
+            f = open(txt_path,"w")
+            f.writelines(labels)
+            f.close()
+    
     ModelEvaluation = ("Model Evaluation", model_evaluation)
+    DatasetWithModelPrediction = ("Dataset With Model Prediction", dataset_with_model_prediction)
 
 class Operations(Enum):
     REVIEW = ("Review Operations",ReviewOperations)
