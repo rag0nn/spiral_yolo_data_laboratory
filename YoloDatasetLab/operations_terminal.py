@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from tqdm import tqdm
 import logging
 from omegaconf import OmegaConf
 from enum import Enum
@@ -239,7 +240,22 @@ class EditOperations(Enum):
         dataset, idx = _select_dataset()
         dataset.fix_object_errors()
         
-
+    @_timer("Get Objectless Parts (Background)")
+    def get_objectless_background_images():
+        dataset, idx = _select_dataset()
+        conf = get_conf()
+        chosen_project = _get_current_project(conf)
+        new_ds = chosen_project.create_dataset(f"{dataset.name}_BACKGROUND",["tasit","insan","UAP","UAI"])
+        results = dataset.get_backround_parts_of_images()
+        for title in ['train','test','val']:
+            datas = results[title]
+            for frame, name in tqdm(datas,desc=title):
+                out_path = Path(new_ds.path,'detect','images',title,name)
+                cv2.imwrite(out_path,frame)
+                txt_path = Path(new_ds.path,'detect','labels',title,name.split(".")[0]+ ".txt")
+                f = open(txt_path,"w")
+                f.close()
+    
         
     ProjectCreateProject = ("Create Project", create_project)
     ProjectCreateDataset = ("Create Dataset", create_dataset)
@@ -259,6 +275,7 @@ class EditOperations(Enum):
     DatasetApplyFilter = ("Apply Filter", apply_filters)
     DatasetSliceImages = ("Slice Images", slice_images)
     DatasetFixObjectErrors = ("Dataset Fix Object Errors", fix_dataset_object_errors)
+    DatasetGetObjectlessParts = ("Get Objectless Parts (Background)", get_objectless_background_images)
     
 class ReviewOperations(Enum):
     """
@@ -363,7 +380,7 @@ class ModelOperations(Enum):
         model, idx = _select_model()
         images_path = str(input("Images Path: "))
         new_ds = p.create_dataset(f"{Path(images_path).stem}_PREDICTED",["tasit","insan","UAP","UAI"])
-        for pth in glob(images_path + "/*.jpg"):
+        for pth in tqdm(glob(images_path + "/*.jpg")):
             frame = cv2.imread(pth)
             labels = []
             results = model.predict(frame)[0]

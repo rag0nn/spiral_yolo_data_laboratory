@@ -7,16 +7,19 @@ from tqdm import tqdm
 import os 
 import shutil
 from typing import Union, Callable, Tuple
+import cv2
 
 from .data import Data
 from .reports import *
 from .enums import Category,DatasetFolders
 from .utils import datetime_id, get_conf
+from .object import Object
 
 
 class Dataset:
     def __init__(self,path):
         self.path = path
+        self.name = Path(path).stem
         self.images_path_dict = self._get_data_paths(DatasetFolders.IMAGES)
         self.annotations_path_dict = self._get_data_paths(DatasetFolders.LABELS)
         matches, unmatched_images, unmatched_annotations=  self._data_conjugations()
@@ -618,6 +621,81 @@ class Dataset:
                 if exit_category:
                     break
 
+    def get_backround_parts_of_images(self) -> dict[Category, Tuple[np.array, str]]:
+        """
+        Find background image using objectless areas
+        Returns:
+            Results_dict (dict[Category,Tuple[np.array,str]]) : Dictionary for per category which includes Tuple of image,image_name like 
+                {'train': [(frame, frame_name),(),...], 'test': [(),...], 'val' : [(),...]}
+        """
+
+        def _find_objecteless_part(frame, objects: list[Object]):
+            h, w, _ = frame.shape
+            for obj in objects:
+                obj.to_absolute(w, h)
+
+            mask = np.zeros((h, w), dtype=np.uint8)
+            for obj in objects:
+                mask[obj.y1:obj.y2, obj.x1:obj.x2] = 1
+
+            def max_histogram_area(heights):
+                stack = []
+                max_area = 0
+                left = 0
+                right = 0
+                height = 0
+                i = 0
+                while i <= len(heights):
+                    h = heights[i] if i < len(heights) else 0
+                    if not stack or h >= heights[stack[-1]]:
+                        stack.append(i)
+                        i += 1
+                    else:
+                        top = stack.pop()
+                        width = i if not stack else i - stack[-1] - 1
+                        area = heights[top] * width
+                        if area > max_area:
+                            max_area = area
+                            height = heights[top]
+                            right = i
+                            left = i - width
+                return max_area, left, right, height
+
+            max_area = 0
+            final_rect = None
+            histogram = [0] * w
+
+            for y in range(h):
+                for x in range(w):
+                    histogram[x] = 0 if mask[y, x] else histogram[x] + 1
+                area, left, right, height = max_histogram_area(histogram)
+                if area > max_area:
+                    max_area = area
+                    final_rect = (left, y - height + 1, right, y + 1)
+
+            if final_rect:
+                x1, y1, x2, y2 = final_rect
+                crop = frame[y1:y2, x1:x2]
+                return cv2.resize(crop, (w, h))
+            else:
+                return None
+
+        results = {
+            'train': [],
+            'val': [],
+            'test': []
+        }
+        for cat in Category:
+            datas = self.get_data(cat)
+            for data in tqdm(datas, desc=cat.value):
+                frame = data.image_data.get_image()
+                objects = data.annotation_data.objects
+                output = _find_objecteless_part(frame, objects)
+                if output is not None:
+                    results[cat.value].append((output, data.image_data.path.name))
+
+        return results
+                
     @staticmethod      
     def build_skeleton(path):
         """
